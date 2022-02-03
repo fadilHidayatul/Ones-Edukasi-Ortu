@@ -24,9 +24,9 @@ class CardAppBar extends StatelessWidget {
           Align(
             alignment: Alignment.center,
             child: Text(
-              "Akademik",
+              title,
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700,color: Colors.white),
             ),
           ),
           Align(

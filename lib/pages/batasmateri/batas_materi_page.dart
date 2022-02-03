@@ -5,6 +5,7 @@ import 'package:dropdown_search/dropdown_search.dart';
 import 'package:edu_ready/model/mapel.dart';
 import 'package:edu_ready/providers/materi_provider.dart';
 import 'package:edu_ready/widgets/batas_materi_popup.dart';
+import 'package:edu_ready/widgets/card_appbar_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -155,33 +156,7 @@ class _MateriPageState extends State<MateriPage> {
         preferredSize: Size(double.infinity, AppBar().preferredSize.height),
         child: Container(
           color: Colors.grey.shade200,
-          child: Card(
-            color: Color(0xFFFF8C00).withOpacity(0.7),
-            elevation: 0,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            margin: EdgeInsets.fromLTRB(
-                10, MediaQuery.of(context).padding.top + 6, 10, 4),
-            child: Stack(
-              children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: IconButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      icon: Icon(
-                        CupertinoIcons.back,
-                        color: Colors.white,
-                      )),
-                ),
-                Align(
-                  alignment: Alignment.center,
-                  child: Text("Batasan Materi"),
-                )
-              ],
-            ),
-          ),
+          child: CardAppBar(title: "Batasan Materi"),
         ),
       ),
       body: Column(

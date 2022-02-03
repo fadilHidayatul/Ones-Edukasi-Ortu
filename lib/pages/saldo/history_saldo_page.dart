@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:edu_ready/model/history_saldo.dart';
 import 'package:edu_ready/providers/history_saldo_provider.dart';
 import 'package:edu_ready/utils/currency.dart';
+import 'package:edu_ready/widgets/card_appbar_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -114,38 +115,7 @@ class _HistorySaldoState extends State<HistorySaldo> {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size(double.infinity, AppBar().preferredSize.height),
-        child: Card(
-          elevation: 0,
-          color: Color(0xFFFF8C00).withOpacity(0.7),
-          margin: EdgeInsets.fromLTRB(
-              10, MediaQuery.of(context).padding.top + 6, 10, 4),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          child: Stack(
-            children: [
-              Align(
-                alignment: Alignment.center,
-                child: Text(
-                  "History Top Up",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
-                ),
-              ),
-              Align(
-                alignment: Alignment.topLeft,
-                child: IconButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  icon: Icon(
-                    CupertinoIcons.back,
-                    color: Colors.white,
-                  ),
-                ),
-              )
-            ],
-          ),
-        ),
+        child: CardAppBar(title: "History Top Up"),
       ),
       body: Column(
         children: [

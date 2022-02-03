@@ -3,6 +3,7 @@
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:edu_ready/model/absensi_harian.dart';
 import 'package:edu_ready/providers/absensi_provider.dart';
+import 'package:edu_ready/widgets/card_appbar_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -121,37 +122,7 @@ class _AbsensiPageState extends State<AbsensiPage> {
         preferredSize: Size(double.infinity, AppBar().preferredSize.height),
         child: Container(
           color: Colors.grey.shade200,
-          child: Card(
-            color: Color(0xFFFF8C00).withOpacity(0.7),
-            elevation: 0,
-            margin: EdgeInsets.fromLTRB(
-                10, MediaQuery.of(context).padding.top + 6, 10, 4),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            child: Stack(
-              children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: IconButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    icon: Icon(
-                      CupertinoIcons.back,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.center,
-                  child: Text(
-                    "Absensi Siswa",
-                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          child: CardAppBar(title: "Absensi Siswa"),
         ),
       ),
       body: Container(
