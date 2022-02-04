@@ -8,6 +8,7 @@ import 'package:edu_ready/pages/welcome/home_page.dart';
 import 'package:edu_ready/pages/saldo/history_saldo_page.dart';
 import 'package:edu_ready/pages/welcome/login_page.dart';
 import 'package:edu_ready/providers/absensi_provider.dart';
+import 'package:edu_ready/providers/akademik_provider.dart';
 import 'package:edu_ready/providers/auth_provider.dart';
 import 'package:edu_ready/providers/dashboard_provider.dart';
 import 'package:edu_ready/providers/history_saldo_provider.dart';
@@ -35,6 +36,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => AbsensiProvider()),
         ChangeNotifierProvider(create: (context) => MateriProvider()),
         ChangeNotifierProvider(create: (context) => InformasiProvider()),
+        ChangeNotifierProvider(create: (context) => AkademikProvider()),
       ],
       builder: (context, child) => MaterialApp(
         debugShowCheckedModeBanner: false,
