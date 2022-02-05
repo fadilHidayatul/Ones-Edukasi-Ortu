@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:dropdown_search/dropdown_search.dart';
+import 'package:edu_ready/model/akademik_khusus.dart';
 import 'package:edu_ready/model/akademik_umum.dart';
 import 'package:edu_ready/providers/akademik_provider.dart';
 import 'package:edu_ready/widgets/card_appbar_widget.dart';
@@ -24,6 +25,8 @@ class _AkademikPageState extends State<AkademikPage> {
   int groupvalue = 0;
   int lastpage = 0;
   int page = 0;
+  int lastpagekhusus = 0;
+  int pagekhusus = 0;
 
   List<String> thn = ["2021/2022"];
   List<String> nilai = ["SEMUA", "ULANGAN HARIAN", "MID", "UAS"];
@@ -32,6 +35,10 @@ class _AkademikPageState extends State<AkademikPage> {
 
   List<Datum> dataakaumum = [];
   List<Datum> dataumumfiltered = [];
+
+  List<DatumKhusus> dataakakhusus = [];
+
+  final ScrollController _controller = ScrollController();
 
   @override
   void initState() {
@@ -44,6 +51,7 @@ class _AkademikPageState extends State<AkademikPage> {
     if (firstinit) {
       var prov = Provider.of<AkademikProvider>(context, listen: false);
       dataakaumum.clear();
+      dataakakhusus.clear();
 
       prov.getfirstakademikumum().then((value) {
         setState(() {
@@ -62,9 +70,28 @@ class _AkademikPageState extends State<AkademikPage> {
       });
 
       /////////get akademik khusus here////////
+      prov.getfirstakademikkhusus().then((value) {
+        setState(() {
+          lastpagekhusus = prov.lastpagekhusus;
+        });
+
+        for (var element in prov.listakakhusus[pagekhusus].data!) {
+          dataakakhusus.add(element);
+        }
+      }).catchError((onError) {
+        print("init khusus gagal $onError");
+      });
 
       firstinit = false;
     }
+
+    ///scroll controller untuk list khusus
+    _controller.addListener(() {
+      if (_controller.position.pixels == _controller.position.maxScrollExtent) {
+        _getmoreakademikkhusus();
+      }
+    });
+
     super.didChangeDependencies();
   }
 
@@ -96,6 +123,29 @@ class _AkademikPageState extends State<AkademikPage> {
     }
   }
 
+  _getmoreakademikkhusus() {
+    var prov = Provider.of<AkademikProvider>(context, listen: false);
+
+    if (pagekhusus < lastpagekhusus) {
+      
+    print("do it");
+      prov.moreakademikkhusus(pagekhusus+2).then((value){
+        var newdata = prov.listakakhusus[pagekhusus+1].data;
+
+        int iteration = 0;
+        for (var i = dataakakhusus.length; i < dataakakhusus.length+newdata!.length; i++) {
+          dataakakhusus.add(newdata[iteration]);
+          iteration++;
+        }
+        pagekhusus++;
+        setState(() {});
+
+      }).catchError((onError){
+        print("gagal menambahkan page ke ${pagekhusus+2}");
+      }); 
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -106,6 +156,7 @@ class _AkademikPageState extends State<AkademikPage> {
         ),
       ),
       body: Column(
+        mainAxisSize: MainAxisSize.max,
         children: [
           ////Slider umum khusus
           Row(
@@ -226,183 +277,190 @@ class _AkademikPageState extends State<AkademikPage> {
 
           ////content
           (groupvalue == 0)
-              ? Expanded(
-                  child: Padding(
-                  padding: const EdgeInsets.all(10),
+              ? Expanded( 
+                  child: Card(
+                  color: Colors.white,
+                  elevation: 2,
+                  semanticContainer: false,
+                  margin: EdgeInsets.all(10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 8, horizontal: 12),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: const [
+                            Text("Mata Pelajaran"),
+                            Text("Nilai"),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        width: double.infinity,
+                        height: 0.5,
+                        color: Color(0xFFFF8C00),
+                      ),
+                      Expanded(
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: (selectedNilai == "SEMUA")
+                              ? dataakaumum.length
+                              : dataumumfiltered.length,
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 13),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.max,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Flexible(
+                                    flex: 9,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text((selectedNilai == "SEMUA")
+                                            ? dataakaumum[index].namapel!
+                                            : dataumumfiltered[index].namapel!),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              (selectedNilai == "SEMUA")
+                                                  ? "${DateFormat("d MMMM yyyy", "ID_id").format(dataakaumum[index].tanggal!)}   "
+                                                  : "${DateFormat("d MMMM yyyy", "ID_id").format(dataumumfiltered[index].tanggal!)}   ",
+                                              style: TextStyle(fontSize: 13),
+                                            ),
+                                            Text(
+                                              (selectedNilai == "SEMUA")
+                                                  ? dataakaumum[index].tipe!
+                                                  : dataumumfiltered[index]
+                                                      .tipe!,
+                                              style: TextStyle(
+                                                  color: Color(0xFFFF8C00),
+                                                  fontSize: 13),
+                                            )
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Flexible(
+                                      flex: 1,
+                                      child: Text(
+                                        (selectedNilai =="SEMUA")? "${dataakaumum[index].nilainya}" : "${dataumumfiltered[index].nilainya}"
+                                          ))
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ))
+              : Expanded(
                   child: Card(
                     color: Colors.white,
-                    elevation: 2,
+                    elevation: 1,
+                    margin: EdgeInsets.fromLTRB(10, 5, 10, 10),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                        borderRadius: BorderRadius.circular(8)),
                     child: Column(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 8, horizontal: 12),
+                          padding:
+                              EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisSize: MainAxisSize.max,
                             children: const [
-                              Text("Mata Pelajaran"),
-                              Text("Nilai"),
+                              Flexible(
+                                  flex: 9,
+                                  child: SizedBox(
+                                      width: double.infinity,
+                                      child: Text("Surah"))),
+                              Flexible(
+                                  flex: 2,
+                                  child: SizedBox(
+                                      width: double.infinity,
+                                      child: Text(
+                                        "Ayat",
+                                        textAlign: TextAlign.center,
+                                      ))),
                             ],
                           ),
                         ),
                         Container(
                           width: double.infinity,
-                          height: 0.5,
+                          height: 0.4,
                           color: Color(0xFFFF8C00),
                         ),
                         Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 4, horizontal: 13),
-                            child: ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: (selectedNilai == "SEMUA")
-                                  ? dataakaumum.length
-                                  : dataumumfiltered.length,
-                              itemBuilder: (context, index) {
-                                return Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 10),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.max,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Flexible(
+                          child: ListView.builder(
+                            controller: _controller,
+                            shrinkWrap: true,
+                            itemCount: dataakakhusus.length,
+                            itemBuilder: (context, index) {
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 8, horizontal: 12),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Flexible(
                                         flex: 9,
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text((selectedNilai == "SEMUA")
-                                                ? dataakaumum[index].namapel!
-                                                : dataumumfiltered[index]
-                                                    .namapel!),
-                                            Row(
-                                              children: [
-                                                Text(
-                                                  (selectedNilai == "SEMUA")
-                                                      ? "${DateFormat("d MMMM yyyy", "ID_id").format(dataakaumum[index].tanggal!)}   "
-                                                      : "${DateFormat("d MMMM yyyy", "ID_id").format(dataumumfiltered[index].tanggal!)}   ",
-                                                  style:
-                                                      TextStyle(fontSize: 13),
-                                                ),
-                                                Text(
-                                                  (selectedNilai == "SEMUA")
-                                                      ? dataakaumum[index].tipe!
-                                                      : dataumumfiltered[index]
-                                                          .tipe!,
-                                                  style: TextStyle(
-                                                      color: Color(0xFFFF8C00),
-                                                      fontSize: 13),
-                                                )
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      Flexible(
-                                          flex: 1,
-                                          child: Text(
-                                              "${dataakaumum[index].nilainya}"))
-                                    ],
-                                  ),
-                                );
-                              },
-                            ),
+                                        child: SizedBox(
+                                          width: double.infinity,
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                dataakakhusus[index].surah!,
+                                                style: TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              Text(
+                                                  "Pengajar : ${dataakakhusus[index].nama}"),
+                                              Text(DateFormat(
+                                                      "d MMMM yyyy", "ID_id")
+                                                  .format(dataakakhusus[index]
+                                                      .tgl!)),
+                                            ],
+                                          ),
+                                        )),
+                                    Flexible(
+                                        flex: 2,
+                                        child: SizedBox(
+                                            width: double.infinity,
+                                            child: Text(
+                                              dataakakhusus[index].ayat!,
+                                              textAlign: TextAlign.center,
+                                            ))),
+                                  ],
+                                ),
+                              );
+                            },
                           ),
                         ),
                       ],
-                    ),
-                  ),
-                ))
-              : Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
-                    child: Card(
-                      color: Colors.red,
-                      elevation: 1,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8)),
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.symmetric(
-                                vertical: 8, horizontal: 12),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.max,
-                              children: const [
-                                Flexible(
-                                    flex: 9,
-                                    child: SizedBox(
-                                        width: double.infinity,
-                                        child: Text("Surah"))),
-                                Flexible(
-                                    flex: 2,
-                                    child: SizedBox(
-                                        width: double.infinity,
-                                        child: Text(
-                                          "Ayat",
-                                          textAlign: TextAlign.center,
-                                        ))),
-                              ],
-                            ),
-                          ),
-                          Container(
-                            width: double.infinity,
-                            height: 0.4,
-                            color: Color(0xFFFF8C00),
-                          ),
-                          Expanded(
-                            child: ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: 1,
-                              itemBuilder: (context, index) {
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 8, horizontal: 12),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Flexible(
-                                          flex: 9,
-                                          child: SizedBox(
-                                            width: double.infinity,
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: const [
-                                                Text("Nama Surah"),
-                                                Text("Pengajar : Anonym"),
-                                                Text("Tanggal"),
-                                              ],
-                                            ),
-                                          )),
-                                      Flexible(
-                                          flex: 2,
-                                          child: SizedBox(
-                                              width: double.infinity,
-                                              child: Text(
-                                                "110-256",
-                                                textAlign: TextAlign.center,
-                                              ))),
-                                    ],
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
                     ),
                   ),
                 )
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 }

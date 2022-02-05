@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:edu_ready/model/akademik_khusus.dart';
 import 'package:edu_ready/model/akademik_umum.dart';
 import 'package:edu_ready/model/user.dart';
 import 'package:flutter/material.dart';
@@ -9,10 +10,19 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AkademikProvider with ChangeNotifier {
   final List<AkademikUmum> _list1 = [];
   List<AkademikUmum> get listakaumum => _list1;
+  final List<AkademikKhusus> _list2 = [];
+  List<AkademikKhusus> get listakakhusus => _list2;
 
   String urlUmum =
       "https://api-develop.ones-edu.com/api/v1/list-nilai-akademik-anak";
   int lastpage = 0;
+
+  String urlKhusus =
+      "https://api-develop.ones-edu.com/api/v1/list-nilai-tahfis-anak";
+  int lastpagekhusus = 0;
+
+  String token = "";
+  String idortu = "";
 
   Future<void> getfirstakademikumum() async {
     SharedPreferences sp = await SharedPreferences.getInstance();
@@ -70,5 +80,57 @@ class AkademikProvider with ChangeNotifier {
     } catch (e) {
       rethrow;
     }
+  }
+
+  Future<void> getfirstakademikkhusus() async {
+    SharedPreferences sp = await SharedPreferences.getInstance();
+    Map<String, dynamic> user = json.decode(sp.getString('user') ?? "");
+    var getuser = User.fromJson(user);
+    token = getuser.data!.token!;
+    idortu = getuser.data!.user!.idnya!;
+
+    Map<String, String> headers = {"Authorization": "Bearer $token"};
+
+    Uri url = Uri.parse("$urlKhusus?idortu=$idortu&page=1");
+
+    try {
+      var response = await http.get(url,headers: headers);
+      if (response.statusCode == 200) {
+        _list2.clear();
+        
+        var decodeData = json.decode(response.body);
+        _list2.add(AkademikKhusus.fromJson(decodeData));
+        lastpagekhusus = listakakhusus[0].lastPage!;
+        
+        notifyListeners();
+      }else{
+        print("Data khusus gagal didapatkan");
+        throw("Error : ${ response.statusCode }");
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> moreakademikkhusus(page) async {
+    Map<String,String> headers = {"Authorization" : "Bearer $token"};
+
+    Uri url = Uri.parse("$urlKhusus?idortu=$idortu&page=$page");
+
+    try {
+      var response = await http.get(url,headers: headers);
+      if (response.statusCode == 200) {
+        var decodeData = json.decode(response.body);
+        _list2.add(AkademikKhusus.fromJson(decodeData));
+
+        notifyListeners();
+      }else{
+        print("Error ambil page ke$page ${response.statusCode}");
+        throw("Error : ${ response.statusCode }");
+      }
+    } catch (e) {
+      rethrow;
+    }
+    
   }
 }

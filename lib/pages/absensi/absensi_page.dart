@@ -146,6 +146,7 @@ class _AbsensiPageState extends State<AbsensiPage> {
                             showSelectedItems: true,
                             items: selected,
                             selectedItem: selected[0],
+                            maxHeight: 160,
                             dropdownSearchDecoration: InputDecoration(
                                 contentPadding:
                                     EdgeInsets.symmetric(horizontal: 10),
