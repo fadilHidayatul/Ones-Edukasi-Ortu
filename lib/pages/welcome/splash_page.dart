@@ -12,6 +12,7 @@ import 'package:provider/provider.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
+  static const pageRoute = '/splash';
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -47,7 +48,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     Timer(
-      Duration(seconds: 6),
+      Duration(seconds: 3),
       () => checkUser()
     );
   }

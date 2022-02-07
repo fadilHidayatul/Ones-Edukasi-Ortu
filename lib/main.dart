@@ -7,6 +7,7 @@ import 'package:edu_ready/pages/informasi/informasi_page.dart';
 import 'package:edu_ready/pages/welcome/home_page.dart';
 import 'package:edu_ready/pages/saldo/history_saldo_page.dart';
 import 'package:edu_ready/pages/welcome/login_page.dart';
+import 'package:edu_ready/pages/welcome/splash_page.dart';
 import 'package:edu_ready/providers/absensi_provider.dart';
 import 'package:edu_ready/providers/akademik_provider.dart';
 import 'package:edu_ready/providers/auth_provider.dart';
@@ -42,7 +43,7 @@ class MyApp extends StatelessWidget {
       ],
       builder: (context, child) => MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: LoginPage(),
+        home: SplashScreen(),
         theme: ThemeData(
             visualDensity: VisualDensity.adaptivePlatformDensity,
             colorScheme: ColorScheme.light(
@@ -71,6 +72,7 @@ class MyApp extends StatelessWidget {
               ),
             )),
         routes: {
+          SplashScreen.pageRoute : (context) => SplashScreen(),
           LoginPage.pageRoute: (context) => LoginPage(),
           HomePage.pageRoute: (context) => HomePage(),
           HistorySaldo.pageRoute: (context) => HistorySaldo(),

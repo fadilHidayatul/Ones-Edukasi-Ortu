@@ -30,10 +30,10 @@ class AkademikKhusus {
     int? from;
     int? lastPage;
     String? lastPageUrl;
-    dynamic? nextPageUrl;
+    dynamic nextPageUrl;
     String? path;
     int? perPage;
-    dynamic? prevPageUrl;
+    dynamic prevPageUrl;
     int? to;
     int? total;
 

@@ -33,7 +33,7 @@ class AkademikUmum {
     String? nextPageUrl;
     String? path;
     int? perPage;
-    dynamic? prevPageUrl;
+    dynamic prevPageUrl;
     int? to;
     int? total;
 
