@@ -1,9 +1,10 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, unnecessary_null_comparison
 
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:edu_ready/model/informasi.dart';
+import 'package:edu_ready/pages/informasi/informasi_pdf.dart';
 import 'package:edu_ready/providers/informasi_provider.dart';
 import 'package:edu_ready/widgets/card_appbar_widget.dart';
 import 'package:edu_ready/widgets/no_data_widget.dart';
@@ -907,8 +908,34 @@ class _InformasiPageState extends State<InformasiPage> {
                                                                           '.')
                                                                       .last ==
                                                                   "pdf")
-                                                              ? Image.asset(
-                                                                  "assets/images/splash.png")
+                                                              ? TextButton(
+                                                                  onPressed:
+                                                                      () {
+                                                                    Provider.of<InformasiProvider>(
+                                                                            context,
+                                                                            listen:
+                                                                                false)
+                                                                        .getfilepdf(
+                                                                            "$urlimage${listkhususriwayat[index].pathDokumen}",
+                                                                            index).then((value){
+                                                                              if (value!=null) {
+                                                                                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                                                                                  return InformasiPdfDetail(path: value.path,title: listkhususriwayat[index].judul,);
+                                                                                },));
+                                                                              }
+                                                                            });
+                                                                  },
+                                                                  child: Text(
+                                                                    "Lihat file PDF",
+                                                                    style: TextStyle(
+                                                                        fontSize:
+                                                                            14,
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .bold,
+                                                                        color: Color(
+                                                                            0xFFFF8C00)),
+                                                                  ))
                                                               : CachedNetworkImage(
                                                                   imageUrl:
                                                                       "$urlimage${listkhususriwayat[index].pathDokumen}",

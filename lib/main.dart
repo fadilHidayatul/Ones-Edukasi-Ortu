@@ -80,6 +80,7 @@ class MyApp extends StatelessWidget {
           MateriPage.pageRoute: (context) => MateriPage(),
           InformasiPage.pageRoute: (context) => InformasiPage(),
           AkademikPage.pageRoute: (context) => AkademikPage(),
+
         },
       ),
     );

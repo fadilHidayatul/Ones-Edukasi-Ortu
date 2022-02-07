@@ -408,7 +408,7 @@ class _HomePageState extends State<HomePage> {
                                             child: ClipRRect(
                                               borderRadius:
                                                   BorderRadius.circular(48),
-                                              child: Container(
+                                              child: SizedBox(
                                                 width: 65,
                                                 height: 65,
                                                 child: FittedBox(

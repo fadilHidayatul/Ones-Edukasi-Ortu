@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:edu_ready/model/informasi.dart';
 import 'package:edu_ready/model/user.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart'as http;
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class InformasiProvider with ChangeNotifier {
@@ -65,6 +67,24 @@ class InformasiProvider with ChangeNotifier {
 
     } catch (e) {
       rethrow;
+    }
+
+  }
+
+
+  Future<File> getfilepdf(String urlpdf, int index) async{
+    try {
+      Uri url = Uri.parse(urlpdf);
+      var response = await http.get(url);
+      var bytes = response.bodyBytes;
+      var dir = await getApplicationDocumentsDirectory();
+
+      File file = File("${dir.path}/mypdfonline$index.pdf");
+      File urlFile = await file.writeAsBytes(bytes);
+
+      return urlFile;
+    } catch (e) {
+      throw Exception("Error open pdf file");
     }
 
   }
