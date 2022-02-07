@@ -15,11 +15,13 @@ import 'package:edu_ready/providers/history_saldo_provider.dart';
 import 'package:edu_ready/providers/informasi_provider.dart';
 import 'package:edu_ready/providers/materi_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   runApp(const MyApp());
 }
 
@@ -42,6 +44,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         home: LoginPage(),
         theme: ThemeData(
+            visualDensity: VisualDensity.adaptivePlatformDensity,
             colorScheme: ColorScheme.light(
                 primary: Color(0xFFFF6600),
                 secondary: Color(0xFFFFCC80),
@@ -73,8 +76,8 @@ class MyApp extends StatelessWidget {
           HistorySaldo.pageRoute: (context) => HistorySaldo(),
           AbsensiPage.pageRoute: (context) => AbsensiPage(),
           MateriPage.pageRoute: (context) => MateriPage(),
-          InformasiPage.pageRoute : (context) => InformasiPage(),
-          AkademikPage.pageRoute : (context) => AkademikPage(),
+          InformasiPage.pageRoute: (context) => InformasiPage(),
+          AkademikPage.pageRoute: (context) => AkademikPage(),
         },
       ),
     );

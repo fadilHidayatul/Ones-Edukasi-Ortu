@@ -738,11 +738,16 @@ class _HomePageState extends State<HomePage> {
                                       ],
                                     ),
 
-                                    Text(
-                                      "lihat detail",
-                                      style: TextStyle(
-                                          color: Color(0xFFFFA726),
-                                          fontWeight: FontWeight.bold),
+                                    GestureDetector(
+                                      onTap: () {
+                                        Navigator.pushNamed(context, AkademikPage.pageRoute);
+                                      },
+                                      child: Text(
+                                        "lihat detail",
+                                        style: TextStyle(
+                                            color: Color(0xFFFFA726),
+                                            fontWeight: FontWeight.bold),
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -1050,18 +1055,23 @@ class _HomePageState extends State<HomePage> {
                                 Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
-                                  children: const [
+                                  children: [
                                     Text(
                                       "Penilaian Khusus",
                                       style: TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold),
                                     ),
-                                    Text(
-                                      "lihat detail",
-                                      style: TextStyle(
-                                          color: Color(0xFFFFA726),
-                                          fontWeight: FontWeight.bold),
+                                    GestureDetector(
+                                      onTap: () {
+                                        Navigator.pushNamed(context, AkademikPage.pageRoute,arguments: 1);
+                                      },
+                                      child: Text(
+                                        "lihat detail",
+                                        style: TextStyle(
+                                            color: Color(0xFFFFA726),
+                                            fontWeight: FontWeight.bold),
+                                      ),
                                     ),
                                   ],
                                 ),
