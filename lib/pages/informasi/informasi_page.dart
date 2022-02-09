@@ -911,19 +911,19 @@ class _InformasiPageState extends State<InformasiPage> {
                                                               ? TextButton(
                                                                   onPressed:
                                                                       () {
-                                                                    Provider.of<InformasiProvider>(
-                                                                            context,
-                                                                            listen:
-                                                                                false)
-                                                                        .getfilepdf(
-                                                                            "$urlimage${listkhususriwayat[index].pathDokumen}",
-                                                                            index).then((value){
-                                                                              if (value!=null) {
-                                                                                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                                                                                  return InformasiPdfDetail(path: value.path,title: listkhususriwayat[index].judul,);
-                                                                                },));
-                                                                              }
-                                                                            });
+                                                                    // Provider.of<InformasiProvider>(
+                                                                    //         context,
+                                                                    //         listen:
+                                                                    //             false)
+                                                                    //     .getfilepdf(
+                                                                    //         "$urlimage${listkhususriwayat[index].pathDokumen}",
+                                                                    //         index).then((value){
+                                                                    //           if (value!=null) {
+                                                                    //             Navigator.push(context, MaterialPageRoute(builder: (context) {
+                                                                    //               return InformasiPdfDetail(path: value.path,title: listkhususriwayat[index].judul,);
+                                                                    //             },));
+                                                                    //           }
+                                                                    //         });
                                                                   },
                                                                   child: Text(
                                                                     "Lihat file PDF",

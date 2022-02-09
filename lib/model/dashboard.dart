@@ -16,6 +16,7 @@ class Dashboard {
     this.bDepanSekarang,
     this.saldo,
     this.nilaiDashboard,
+    this.nilaiDashboardGrafik,
     this.showtanggungan,
     this.batasmateri,
     this.tahfis,
@@ -27,6 +28,7 @@ class Dashboard {
   List<BDepanSekarang>? bDepanSekarang;
   String? saldo;
   List<NilaiDashboard>? nilaiDashboard;
+  List<NilaiDashboardGrafik>? nilaiDashboardGrafik;
   List<Showtanggungan>? showtanggungan;
   List<Batasmateri>? batasmateri;
   List<Tahfi>? tahfis;
@@ -41,6 +43,9 @@ class Dashboard {
         saldo: json["saldo"],
         nilaiDashboard: List<NilaiDashboard>.from(
             json["nilaiDashboard"].map((x) => NilaiDashboard.fromJson(x))),
+        nilaiDashboardGrafik: List<NilaiDashboardGrafik>.from(
+            json["nilaiDashboardGrafik"]
+                .map((x) => NilaiDashboardGrafik.fromJson(x))),
         showtanggungan: List<Showtanggungan>.from(
             json["showtanggungan"].map((x) => Showtanggungan.fromJson(x))),
         batasmateri: List<Batasmateri>.from(
@@ -59,6 +64,8 @@ class Dashboard {
         "saldo": saldo,
         "nilaiDashboard":
             List<dynamic>.from(nilaiDashboard!.map((x) => x.toJson())),
+        "nilaiDashboardGrafik":
+            List<dynamic>.from(nilaiDashboardGrafik!.map((x) => x.toJson())),
         "showtanggungan":
             List<dynamic>.from(showtanggungan!.map((x) => x.toJson())),
         "batasmateri": List<dynamic>.from(batasmateri!.map((x) => x.toJson())),
@@ -114,8 +121,8 @@ class Absensi {
 
 class BDepanSekarang {
   BDepanSekarang({
-     this.blnSekarang,
-     this.blnDepan,
+    this.blnSekarang,
+    this.blnDepan,
   });
 
   String? blnSekarang;
@@ -228,6 +235,54 @@ class NilaiDashboard {
         "idmpel": idmpel,
         "idguru": idguru,
       };
+}
+
+class NilaiDashboardGrafik {
+    NilaiDashboardGrafik({
+        required this.mid,
+        required this.uas,
+        required this.idsiswa,
+        required this.tahun,
+        required this.nama,
+        required this.namapel,
+        required this.realnamapel,
+        required this.idmpel,
+        required this.tahunajaran,
+    });
+
+    int mid;
+    int uas;
+    int idsiswa;
+    int tahun;
+    String nama;
+    String namapel;
+    String realnamapel;
+    int idmpel;
+    String tahunajaran;
+
+    factory NilaiDashboardGrafik.fromJson(Map<String, dynamic> json) => NilaiDashboardGrafik(
+        mid: json["MID"],
+        uas: json["UAS"],
+        idsiswa: json["idsiswa"],
+        tahun: json["tahun"],
+        nama: json["nama"],
+        namapel: json["namapel"],
+        realnamapel: json["realnamapel"],
+        idmpel: json["idmpel"],
+        tahunajaran: json["tahunajaran"],
+    );
+
+    Map<String, dynamic> toJson() => {
+        "MID": mid,
+        "UAS": uas,
+        "idsiswa": idsiswa,
+        "tahun": tahun,
+        "nama": nama,
+        "namapel": namapel,
+        "realnamapel": realnamapel,
+        "idmpel": idmpel,
+        "tahunajaran": tahunajaran,
+    };
 }
 
 enum Tahunajaran { THE_20212022 }

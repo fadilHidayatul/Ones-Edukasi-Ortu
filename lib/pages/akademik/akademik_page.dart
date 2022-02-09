@@ -350,7 +350,7 @@ class _AkademikPageState extends State<AkademikPage> {
                                               Text((selectedNilai == "SEMUA")
                                                   ? dataakaumum[index].namapel!
                                                   : dataumumfiltered[index]
-                                                      .namapel!),
+                                                      .namapel!,style: TextStyle(fontWeight: FontWeight.bold),),
                                               Row(
                                                 children: [
                                                   Text(

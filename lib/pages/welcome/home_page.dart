@@ -3,6 +3,7 @@
 import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:edu_ready/model/dashboard.dart';
 import 'package:edu_ready/model/user.dart';
 import 'package:edu_ready/pages/absensi/absensi_page.dart';
 import 'package:edu_ready/pages/akademik/akademik_page.dart';
@@ -13,6 +14,7 @@ import 'package:edu_ready/pages/welcome/login_page.dart';
 import 'package:edu_ready/providers/dashboard_provider.dart';
 import 'package:edu_ready/utils/currency.dart';
 import 'package:edu_ready/widgets/data_siswa_popup.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_beautiful_popup/main.dart';
@@ -37,6 +39,9 @@ class _HomePageState extends State<HomePage> {
   String statusErrorInit = "";
 
   String urlimage = "https://api-develop.ones-edu.com/api/get-stream?path=";
+
+  late List<BarChartGroupData> showBarChartGroup;
+  List<NilaiDashboardGrafik> grafik = [];
 
   @override
   void initState() {
@@ -82,6 +87,34 @@ class _HomePageState extends State<HomePage> {
       firstinitdashboard = false;
     }
     super.didChangeDependencies();
+  }
+
+  BarChartGroupData makeGroupData(int x, double y1, double y2) {
+    return BarChartGroupData(
+      x: x,
+      barsSpace: 8,
+      showingTooltipIndicators: [0, 1],
+      barRods: [
+        BarChartRodData(
+          y: (y1 == 0) ? 1 : y1,
+          colors: [Color(0xFFFFA80F)],
+          width: 12,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(5),
+            topRight: Radius.circular(5),
+          ),
+        ),
+        BarChartRodData(
+          y: (y2 == 0) ? 1 : y2,
+          colors: [Color(0xFFFE8116)],
+          width: 12,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(5),
+            topRight: Radius.circular(5),
+          ),
+        ),
+      ],
+    );
   }
 
   @override
@@ -151,6 +184,25 @@ class _HomePageState extends State<HomePage> {
       body: Consumer<DashboardProvider>(
         builder: (context, value, child) {
           var data = value.getDashboard;
+          List<BarChartGroupData> items = [];
+          int x = 0;
+          grafik.clear();
+
+          if (data.isNotEmpty) {
+            for (var element in data[0].nilaiDashboardGrafik!) {
+              items.add(
+                makeGroupData(
+                  x,
+                  double.parse(element.mid.toString()),
+                  double.parse(element.uas.toString()),
+                ),
+              );
+              grafik.add(element);
+              x++;
+            }
+
+            showBarChartGroup = items;
+          }
 
           return (data.isEmpty)
               ? (statusErrorInit == "Saldo Anda Tidak Cukup")
@@ -416,17 +468,18 @@ class _HomePageState extends State<HomePage> {
                                                   child: CachedNetworkImage(
                                                     imageUrl:
                                                         "$urlimage${data[0].showtanggungan![0].ppsiswa}",
-                                                    placeholder: (context, url) =>
-                                                        CircularProgressIndicator(),
-                                                    errorWidget:
-                                                        (context, url, error) =>
-                                                            Icon(CupertinoIcons.profile_circled),
+                                                    placeholder: (context,
+                                                            url) =>
+                                                        CupertinoActivityIndicator(),
+                                                    errorWidget: (context, url,
+                                                            error) =>
+                                                        Icon(CupertinoIcons
+                                                            .profile_circled),
                                                   ),
                                                 ),
                                               ),
                                             ),
                                           ),
-                                          
                                           SizedBox(
                                             width: 15,
                                           ),
@@ -521,7 +574,8 @@ class _HomePageState extends State<HomePage> {
                                               ),
                                             ),
                                             onTap: () {
-                                              Navigator.pushNamed(context, AkademikPage.pageRoute);
+                                              Navigator.pushNamed(context,
+                                                  AkademikPage.pageRoute);
                                             },
                                           ),
                                           Text("Akademik")
@@ -557,8 +611,8 @@ class _HomePageState extends State<HomePage> {
                                               child: Container(
                                                 color: Color(0xFFFF8C00),
                                                 child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(10.0),
+                                                  padding: const EdgeInsets.all(
+                                                      10.0),
                                                   child: Image.asset(
                                                     "assets/images/informasi.png",
                                                     width: 30,
@@ -567,9 +621,10 @@ class _HomePageState extends State<HomePage> {
                                                 ),
                                               ),
                                             ),
-                                          onTap: (){
-                                            Navigator.pushNamed(context, InformasiPage.pageRoute);
-                                          },
+                                            onTap: () {
+                                              Navigator.pushNamed(context,
+                                                  InformasiPage.pageRoute);
+                                            },
                                           ),
                                           Text("Informasi")
                                         ],
@@ -686,6 +741,7 @@ class _HomePageState extends State<HomePage> {
                     ////////////////////////bagian card nilai umum/////////////////////////////
                     Container(
                       color: Colors.grey.withOpacity(0.2),
+                      width: double.infinity,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
                             vertical: 5, horizontal: 15),
@@ -740,7 +796,8 @@ class _HomePageState extends State<HomePage> {
 
                                     GestureDetector(
                                       onTap: () {
-                                        Navigator.pushNamed(context, AkademikPage.pageRoute);
+                                        Navigator.pushNamed(
+                                            context, AkademikPage.pageRoute);
                                       },
                                       child: Text(
                                         "lihat detail",
@@ -758,147 +815,303 @@ class _HomePageState extends State<HomePage> {
                                   margin: EdgeInsets.symmetric(vertical: 4),
                                 ),
                                 ////***cek data ini apakah null atau tidak****////
-                                (data[0].nilaiDashboard!.isEmpty)
-                                    ? Center(
-                                        child: Text("Belum Ada Data"),
-                                      )
-                                    : Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          /////****switch tampilan berdasarkan pilihan user****///////////
-                                          (statusPenilaian == false)
-                                              ? Column(
-                                                  children: [
-                                                    ////header table////
-                                                    Padding(
-                                                      padding: const EdgeInsets
-                                                              .symmetric(
-                                                          vertical: 8),
-                                                      child: Row(
-                                                        mainAxisSize:
-                                                            MainAxisSize.max,
-                                                        children: const [
-                                                          Flexible(
-                                                              flex: 3,
-                                                              child: SizedBox(
+                                Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    /////****switch tampilan berdasarkan pilihan user****///////////
+                                    (statusPenilaian == false)
+                                        ? (data[0].nilaiDashboard == null)
+                                            ? Center(
+                                                child: Text("Belum Ada Data"),
+                                              )
+                                            : Column(
+                                                children: [
+                                                  ////header table////
+                                                  Padding(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(vertical: 8),
+                                                    child: Row(
+                                                      mainAxisSize:
+                                                          MainAxisSize.max,
+                                                      children: const [
+                                                        Flexible(
+                                                            flex: 3,
+                                                            child: SizedBox(
+                                                              width: double
+                                                                  .infinity,
+                                                              child: Text(
+                                                                "Mata Pelajaran",
+                                                              ),
+                                                            )),
+                                                        Expanded(
+                                                            child: SizedBox(
+                                                          width:
+                                                              double.infinity,
+                                                          child: Text(
+                                                            "Jenis Tes",
+                                                            textAlign: TextAlign
+                                                                .center,
+                                                          ),
+                                                        )),
+                                                        Expanded(
+                                                            child: SizedBox(
+                                                          width:
+                                                              double.infinity,
+                                                          child: Text(
+                                                            "Nilai",
+                                                            textAlign: TextAlign
+                                                                .center,
+                                                          ),
+                                                        )),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  ////body table////
+                                                  SizedBox(
+                                                    height:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .height *
+                                                            0.2,
+                                                    child: ListView.builder(
+                                                      itemCount: data[0]
+                                                          .nilaiDashboard!
+                                                          .length,
+                                                      itemBuilder:
+                                                          (context, index) {
+                                                        return Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .symmetric(
+                                                                  vertical: 5),
+                                                          child: Row(
+                                                            mainAxisSize:
+                                                                MainAxisSize
+                                                                    .max,
+                                                            children: [
+                                                              Flexible(
+                                                                  flex: 3,
+                                                                  child:
+                                                                      SizedBox(
+                                                                    width: double
+                                                                        .infinity,
+                                                                    child: Text(
+                                                                        data[0]
+                                                                            .nilaiDashboard![
+                                                                                index]
+                                                                            .realnamapel,
+                                                                        style: TextStyle(
+                                                                            fontWeight:
+                                                                                FontWeight.bold)),
+                                                                  )),
+                                                              Expanded(
+                                                                  child:
+                                                                      SizedBox(
                                                                 width: double
                                                                     .infinity,
                                                                 child: Text(
-                                                                  "Mata Pelajaran",
+                                                                    "${data[0].nilaiDashboard![index].tipe?.name}",
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .center,
+                                                                    style: TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight.bold)),
+                                                              )),
+                                                              Expanded(
+                                                                  child:
+                                                                      SizedBox(
+                                                                width: double
+                                                                    .infinity,
+                                                                child: Text(
+                                                                  "${data[0].nilaiDashboard![index].nilainya}",
+                                                                  style: TextStyle(
+                                                                      color: Color(
+                                                                          0xFFFFA726),
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold),
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .center,
                                                                 ),
                                                               )),
-                                                          Expanded(
-                                                              child: SizedBox(
-                                                            width:
-                                                                double.infinity,
-                                                            child: Text(
-                                                              "Jenis Tes",
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .center,
-                                                            ),
-                                                          )),
-                                                          Expanded(
-                                                              child: SizedBox(
-                                                            width:
-                                                                double.infinity,
-                                                            child: Text(
-                                                              "Nilai",
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .center,
-                                                            ),
-                                                          )),
-                                                        ],
-                                                      ),
+                                                            ],
+                                                          ),
+                                                        );
+                                                      },
                                                     ),
-                                                    ////body table////
-                                                    SizedBox(
+                                                  )
+                                                ],
+                                              )
+                                        : (data[0].nilaiDashboardGrafik == null)
+                                            ? Center(
+                                                child: Text("Belum Ada Data"),
+                                              )
+                                            : Column(
+                                                children: [
+                                                  ////////grafik/////////
+                                                  SingleChildScrollView(
+                                                    scrollDirection:
+                                                        Axis.horizontal,
+                                                    child: Container(
+                                                      width: grafik.length * 70,
                                                       height:
                                                           MediaQuery.of(context)
                                                                   .size
                                                                   .height *
-                                                              0.2,
-                                                      child: ListView.builder(
-                                                        itemCount: data[0]
-                                                            .nilaiDashboard!
-                                                            .length,
-                                                        itemBuilder:
-                                                            (context, index) {
-                                                          return Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                        .symmetric(
-                                                                    vertical:
-                                                                        5),
+                                                              0.62,
+                                                      margin:
+                                                          EdgeInsets.fromLTRB(
+                                                              0, 25, 0, 0),
+                                                      child: BarChart(
+                                                        BarChartData(
+                                                          maxY: 100,
+                                                          titlesData:
+                                                              FlTitlesData(
+                                                            show: true,
+                                                            rightTitles:
+                                                                SideTitles(
+                                                              showTitles: false,
+                                                            ),
+                                                            topTitles:
+                                                                SideTitles(
+                                                              showTitles: false,
+                                                            ),
+                                                            leftTitles:
+                                                                SideTitles(
+                                                              showTitles: true,
+                                                              reservedSize: 30,
+                                                              interval: 10,
+                                                            ),
+                                                            bottomTitles:
+                                                                SideTitles(
+                                                              showTitles: true,
+                                                              getTitles:
+                                                                  (value) {
+                                                                int i = value
+                                                                    .toInt();
+                                                                return grafik[i]
+                                                                    .namapel;
+                                                              },
+                                                            ),
+                                                          ),
+                                                          gridData: FlGridData(
+                                                            show: true,
+                                                            drawHorizontalLine:
+                                                                true,
+                                                            drawVerticalLine:
+                                                                false,
+                                                          ),
+                                                          borderData:
+                                                              FlBorderData(
+                                                            show: true,
+                                                            border: Border(
+                                                              bottom:
+                                                                  BorderSide(
+                                                                width: 1,
+                                                                color: Colors
+                                                                    .black38,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          barTouchData:
+                                                              BarTouchData(
+                                                            enabled: false,
+                                                            touchTooltipData:
+                                                                BarTouchTooltipData(
+                                                              tooltipBgColor:
+                                                                  Colors
+                                                                      .transparent,
+                                                              direction:
+                                                                  TooltipDirection
+                                                                      .top,
+                                                              tooltipMargin: 0,
+                                                              tooltipPadding:
+                                                                  EdgeInsets
+                                                                      .all(0),
+                                                              getTooltipItem: (
+                                                                group,
+                                                                groupIndex,
+                                                                rod,
+                                                                rodIndex,
+                                                              ) {
+                                                                // print(group.x); // print(rod.y);
+                                                                int nilai = rod
+                                                                    .y
+                                                                    .toInt();
+                                                                return BarTooltipItem(
+                                                                  (nilai == 1)
+                                                                      ? "0"
+                                                                      : nilai
+                                                                          .toString(),
+                                                                  TextStyle(
+                                                                      color: Colors
+                                                                          .black,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold),
+                                                                );
+                                                              },
+                                                            ),
+                                                          ),
+                                                          barGroups:
+                                                              showBarChartGroup,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  //////keterangan grafik///////////
+                                                  Padding(
+                                                      padding: EdgeInsets.only(
+                                                          top: 10),
+                                                      child: Row(
+                                                        children: [
+                                                          Expanded(
                                                             child: Row(
-                                                              mainAxisSize:
-                                                                  MainAxisSize
-                                                                      .max,
                                                               children: [
+                                                                Container(
+                                                                  width: 10,
+                                                                  height: 10,
+                                                                  margin: EdgeInsets.symmetric(horizontal: 6),
+                                                                  decoration: BoxDecoration(
+                                                                      color: Color(
+                                                                          0xFFFFA80F),
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              4)),
+                                                                ),
                                                                 Flexible(
-                                                                    flex: 3,
-                                                                    child:
-                                                                        SizedBox(
-                                                                      width: double
-                                                                          .infinity,
-                                                                      child: Text(
-                                                                          data[0]
-                                                                              .nilaiDashboard![
-                                                                                  index]
-                                                                              .realnamapel,
-                                                                          style:
-                                                                              TextStyle(fontWeight: FontWeight.bold)),
-                                                                    )),
-                                                                Expanded(
-                                                                    child:
-                                                                        SizedBox(
-                                                                  width: double
-                                                                      .infinity,
                                                                   child: Text(
-                                                                      "${data[0].nilaiDashboard![index].tipe?.name}",
-                                                                      textAlign:
-                                                                          TextAlign
-                                                                              .center,
-                                                                      style: TextStyle(
-                                                                          fontWeight:
-                                                                              FontWeight.bold)),
-                                                                )),
-                                                                Expanded(
-                                                                    child:
-                                                                        SizedBox(
-                                                                  width: double
-                                                                      .infinity,
-                                                                  child: Text(
-                                                                    "${data[0].nilaiDashboard![index].nilainya}",
-                                                                    style: TextStyle(
-                                                                        color: Color(
-                                                                            0xFFFFA726),
-                                                                        fontWeight:
-                                                                            FontWeight.bold),
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .center,
-                                                                  ),
-                                                                )),
+                                                                      "Ujian Tengah Semester"),
+                                                                ),
                                                               ],
                                                             ),
-                                                          );
-                                                        },
-                                                      ),
-                                                    )
-                                                  ],
-                                                )
-                                              : Text(
-                                                  "Oops, data grafik belum tersedia",
-                                                  style: TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w400,
-                                                      color: Colors.black54),
-                                                ),
-                                        ],
-                                      ),
+                                                          ),
+                                                          Expanded(
+                                                            child: Row(
+                                                              children: [
+                                                                Container(
+                                                                  width: 10,
+                                                                  height: 10,
+                                                                  margin: EdgeInsets.symmetric(horizontal: 6),
+                                                                  decoration: BoxDecoration(
+                                                                      color: Color(
+                                                                          0xFFFE8116),
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              4)),
+                                                                ),
+                                                                Flexible(child: Text("Ujian Akhir Semester"))
+                                                              ],
+                                                            )
+                                                          )
+                                                        ],
+                                                      )),
+                                                ],
+                                              ),
+                                  ],
+                                ),
                               ],
                             ),
                           ),
@@ -989,7 +1202,9 @@ class _HomePageState extends State<HomePage> {
                                                   Flexible(
                                                     flex: 5,
                                                     child: Text(
-                                                      data[0].absensi![index].namapel,
+                                                      data[0]
+                                                          .absensi![index]
+                                                          .namapel,
                                                       style: TextStyle(
                                                           fontWeight:
                                                               FontWeight.bold),
@@ -997,12 +1212,14 @@ class _HomePageState extends State<HomePage> {
                                                   ),
                                                   Flexible(
                                                     flex: 1,
-                                                    child: CircularPercentIndicator(
+                                                    child:
+                                                        CircularPercentIndicator(
                                                       radius: 50,
                                                       lineWidth: 7,
                                                       percent: double.parse(
                                                               data[0]
-                                                                  .absensi![index]
+                                                                  .absensi![
+                                                                      index]
                                                                   .kehadiran) /
                                                           double.parse(data[0]
                                                               .absensi![index]
@@ -1010,7 +1227,8 @@ class _HomePageState extends State<HomePage> {
                                                       backgroundColor:
                                                           Colors.grey.shade300,
                                                       circularStrokeCap:
-                                                          CircularStrokeCap.round,
+                                                          CircularStrokeCap
+                                                              .round,
                                                       progressColor:
                                                           Color(0xFFFFA726),
                                                       backgroundWidth: 4,
@@ -1019,7 +1237,8 @@ class _HomePageState extends State<HomePage> {
                                                         style: TextStyle(
                                                             fontSize: 10,
                                                             fontWeight:
-                                                                FontWeight.bold),
+                                                                FontWeight
+                                                                    .bold),
                                                       ),
                                                     ),
                                                   ),
@@ -1064,7 +1283,9 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                     GestureDetector(
                                       onTap: () {
-                                        Navigator.pushNamed(context, AkademikPage.pageRoute,arguments: 1);
+                                        Navigator.pushNamed(
+                                            context, AkademikPage.pageRoute,
+                                            arguments: 1);
                                       },
                                       child: Text(
                                         "lihat detail",
@@ -1329,8 +1550,9 @@ class _HomePageState extends State<HomePage> {
                                                 data[0].batasmateri!.length,
                                             itemBuilder: (context, index) {
                                               return Padding(
-                                                padding: const EdgeInsets
-                                                    .symmetric(vertical: 8),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 8),
                                                 child: Row(
                                                   mainAxisSize:
                                                       MainAxisSize.max,
@@ -1344,8 +1566,7 @@ class _HomePageState extends State<HomePage> {
                                                             DateFormat(
                                                                     "d MMM yyyy",
                                                                     'ID_id')
-                                                                .format(data[
-                                                                        0]
+                                                                .format(data[0]
                                                                     .batasmateri![
                                                                         index]
                                                                     .tanggal),
@@ -1387,9 +1608,8 @@ class _HomePageState extends State<HomePage> {
                                                                 .batasmateri![
                                                                     index]
                                                                 .materi,
-                                                            textAlign:
-                                                                TextAlign
-                                                                    .justify,
+                                                            textAlign: TextAlign
+                                                                .justify,
                                                             style: TextStyle(
                                                               fontWeight:
                                                                   FontWeight
