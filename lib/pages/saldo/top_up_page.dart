@@ -1,6 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 
-import 'dart:ui';
+import 'dart:io';
 
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:edu_ready/utils/currency.dart';
@@ -8,6 +8,7 @@ import 'package:edu_ready/widgets/card_appbar_widget.dart';
 import 'package:edu_ready/widgets/card_select_money.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class TopUpPage extends StatefulWidget {
   const TopUpPage({Key? key}) : super(key: key);
@@ -22,6 +23,38 @@ class _TopUpPageState extends State<TopUpPage> {
   final ScrollController _dummycon1 = ScrollController();
   int nominal = 0;
   final TextEditingController _nominalctr = TextEditingController();
+
+  File? pickedImage;
+
+  _getfromgallery() async {
+    pickedImage = null;
+    var image = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      maxHeight: 1800,
+      maxWidth: 1800,
+    );
+
+    if (image != null) {
+      setState(() {
+        pickedImage = File(image.path);
+      });
+    }
+  }
+
+  _getfromcamera() async {
+    pickedImage = null;
+    var image = await ImagePicker().pickImage(
+      source: ImageSource.camera,
+      maxHeight: 1800,
+      maxWidth: 1800,
+    );
+
+    if (image != null) {
+      setState(() {
+        pickedImage = File(image.path);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -165,17 +198,48 @@ class _TopUpPageState extends State<TopUpPage> {
                         ),
                         Column(
                           children: [
-                            Text(
-                              "Bukti Transfer",
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 15),
+                              child: Text(
+                                "Bukti Transfer",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
                             ),
                             //dicek image file sudah ada atau belum
-                            Image.asset(
-                              "assets/images/ic_pembayaran.png",
-                              height: 300,
-                              width: 200,
-                              fit: BoxFit.contain,
-                            ),
+                            (pickedImage == null)
+                                ? Offstage()
+                                : Stack(
+                                    children: [
+                                      Card(
+                                        semanticContainer: true,
+                                        clipBehavior: Clip.antiAlias,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        margin:
+                                            EdgeInsets.fromLTRB(60, 10, 60, 20),
+                                        child: Image.file(
+                                          pickedImage!,
+                                          fit: BoxFit.contain,
+                                        ),
+                                      ),
+                                      Align(
+                                        alignment: Alignment(0.85, 0),
+                                        child: IconButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              pickedImage = null;
+                                            });
+                                          },
+                                          icon: Icon(
+                                            CupertinoIcons.clear_circled_solid,
+                                            color: Color(0xFFFF8C00),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                           ],
                         )
                       ],
@@ -225,20 +289,32 @@ class _TopUpPageState extends State<TopUpPage> {
                                 onTap: () {
                                   final action = CupertinoActionSheet(
                                     message: Text(
-                                      "pilih bukti transfer melalui",
+                                      "Pilih bukti transfer melalui",
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 16,
+                                        fontSize: 17,
                                       ),
                                     ),
                                     actions: [
                                       CupertinoActionSheetAction(
-                                        onPressed: () {},
-                                        child: Text("Galeri"),
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                          _getfromgallery();
+                                        },
+                                        child: Text(
+                                          "Galeri",
+                                          style: TextStyle(fontSize: 15),
+                                        ),
                                       ),
                                       CupertinoActionSheetAction(
-                                        onPressed: () {},
-                                        child: Text("Kamera"),
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                          _getfromcamera();
+                                        },
+                                        child: Text(
+                                          "Kamera",
+                                          style: TextStyle(fontSize: 15),
+                                        ),
                                       ),
                                     ],
                                     cancelButton: CupertinoActionSheetAction(
@@ -246,7 +322,7 @@ class _TopUpPageState extends State<TopUpPage> {
                                       child: Text(
                                         "Batal",
                                         style: TextStyle(
-                                          fontSize: 12,
+                                          fontSize: 15,
                                           color: Colors.black,
                                         ),
                                       ),
@@ -277,7 +353,9 @@ class _TopUpPageState extends State<TopUpPage> {
                                     padding: const EdgeInsets.all(10.0),
                                     child: Center(
                                       child: Text(
-                                        "Bukti Transfer",
+                                        pickedImage == null
+                                            ? "Bukti Transfer"
+                                            : "Upload Ulang Bukti",
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold),
                                       ),
@@ -291,24 +369,71 @@ class _TopUpPageState extends State<TopUpPage> {
                             Flexible(
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                      shape: BoxShape.rectangle,
-                                      gradient: LinearGradient(
-                                          colors: const [
-                                            Color(0xFFDF9F5F),
-                                            Color(0xFFE8BF61)
-                                          ],
-                                          begin: Alignment.topLeft,
-                                          end: Alignment.topRight),
-                                      borderRadius: BorderRadius.circular(12)),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(10.0),
-                                    child: Center(
-                                      child: Text(
-                                        "Top Up Sekarang",
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold),
+                                child: InkWell(
+                                  onTap: () {
+                                    if (nominal == 0) {
+                                      showCupertinoDialog(
+                                        barrierDismissible: true,
+                                        context: context,
+                                        builder: (context) =>
+                                            CupertinoAlertDialog(
+                                          title: Text("Error"),
+                                          content: Text(
+                                            "Harap masukkan besaran Top Up",
+                                          ),
+                                        ),
+                                      );
+                                    } else if (nominal < 3000) {
+                                      showCupertinoDialog(
+                                        barrierDismissible: true,
+                                        context: context,
+                                        builder: (context) =>
+                                            CupertinoAlertDialog(
+                                          title: Text("Error"),
+                                          content: Text(
+                                            "Top Up harus minimal Rp. 3000",
+                                          ),
+                                        ),
+                                      );
+                                    } else if (pickedImage == null) {
+                                      showCupertinoDialog(
+                                        barrierDismissible: true,
+                                        context: context,
+                                        builder: (context) =>
+                                            CupertinoAlertDialog(
+                                          title: Text("Error"),
+                                          content: Text(
+                                            "Isi bukti Top Up terlebih dahulu",
+                                          ),
+                                        ),
+                                      );
+                                    } else {
+                                      var sizemb = pickedImage!.lengthSync() /
+                                          (1024 * 1024);
+                                      print(sizemb);
+                                      print(pickedImage!.path);
+                                    }
+                                  },
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                        shape: BoxShape.rectangle,
+                                        gradient: LinearGradient(
+                                            colors: const [
+                                              Color(0xFFDF9F5F),
+                                              Color(0xFFE8BF61)
+                                            ],
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.topRight),
+                                        borderRadius:
+                                            BorderRadius.circular(12)),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(10.0),
+                                      child: Center(
+                                        child: Text(
+                                          "Top Up Sekarang",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                        ),
                                       ),
                                     ),
                                   ),
