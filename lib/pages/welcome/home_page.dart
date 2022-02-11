@@ -10,6 +10,7 @@ import 'package:edu_ready/pages/akademik/akademik_page.dart';
 import 'package:edu_ready/pages/batasmateri/batas_materi_page.dart';
 import 'package:edu_ready/pages/informasi/informasi_page.dart';
 import 'package:edu_ready/pages/saldo/history_saldo_page.dart';
+import 'package:edu_ready/pages/saldo/top_up_page.dart';
 import 'package:edu_ready/pages/welcome/login_page.dart';
 import 'package:edu_ready/providers/dashboard_provider.dart';
 import 'package:edu_ready/utils/currency.dart';
@@ -382,7 +383,9 @@ class _HomePageState extends State<HomePage> {
                                   mainAxisSize: MainAxisSize.max,
                                   children: [
                                     IconButton(
-                                        onPressed: () {},
+                                        onPressed: () {
+                                          Navigator.pushNamed(context, TopUpPage.pageRoute);
+                                        },
                                         icon: Icon(
                                           CupertinoIcons.tray_arrow_down,
                                           color: Colors.white,
@@ -1073,7 +1076,10 @@ class _HomePageState extends State<HomePage> {
                                                                 Container(
                                                                   width: 10,
                                                                   height: 10,
-                                                                  margin: EdgeInsets.symmetric(horizontal: 6),
+                                                                  margin: EdgeInsets
+                                                                      .symmetric(
+                                                                          horizontal:
+                                                                              6),
                                                                   decoration: BoxDecoration(
                                                                       color: Color(
                                                                           0xFFFFA80F),
@@ -1089,23 +1095,27 @@ class _HomePageState extends State<HomePage> {
                                                             ),
                                                           ),
                                                           Expanded(
-                                                            child: Row(
-                                                              children: [
-                                                                Container(
-                                                                  width: 10,
-                                                                  height: 10,
-                                                                  margin: EdgeInsets.symmetric(horizontal: 6),
-                                                                  decoration: BoxDecoration(
-                                                                      color: Color(
-                                                                          0xFFFE8116),
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              4)),
-                                                                ),
-                                                                Flexible(child: Text("Ujian Akhir Semester"))
-                                                              ],
-                                                            )
-                                                          )
+                                                              child: Row(
+                                                            children: [
+                                                              Container(
+                                                                width: 10,
+                                                                height: 10,
+                                                                margin: EdgeInsets
+                                                                    .symmetric(
+                                                                        horizontal:
+                                                                            6),
+                                                                decoration: BoxDecoration(
+                                                                    color: Color(
+                                                                        0xFFFE8116),
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            4)),
+                                                              ),
+                                                              Flexible(
+                                                                  child: Text(
+                                                                      "Ujian Akhir Semester"))
+                                                            ],
+                                                          ))
                                                         ],
                                                       )),
                                                 ],
