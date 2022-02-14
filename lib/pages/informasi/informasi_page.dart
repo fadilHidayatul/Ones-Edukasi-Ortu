@@ -110,30 +110,35 @@ class _InformasiPageState extends State<InformasiPage> {
                     mainAxisSize: MainAxisSize.max,
                     children: [
                       Expanded(
-                        child: CupertinoSlidingSegmentedControl(
-                          children: {
-                            0: Text(
-                              "Umum",
-                              style: TextStyle(
-                                  color: (groupValue == 0)
-                                      ? Colors.white
-                                      : Colors.black),
-                            ),
-                            1: Text(
-                              "Khusus",
-                              style: TextStyle(
-                                  color: (groupValue == 1)
-                                      ? Colors.white
-                                      : Colors.black),
-                            )
-                          },
-                          onValueChanged: (value) {
-                            setState(() => groupValue = value as int);
-                          },
-                          groupValue: groupValue,
-                          padding: EdgeInsets.fromLTRB(10, 14, 10, 0),
-                          thumbColor: Color(0xFFFF8C00).withOpacity(0.8),
-                          backgroundColor: Colors.white,
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(12, 4, 12, 0),
+                          child: CupertinoSlidingSegmentedControl(
+                            children: {
+                              0: Padding(
+                                padding: EdgeInsets.all(10),
+                                child: Text(
+                                  "Umum",
+                                  style: TextStyle(
+                                      color: (groupValue == 0)
+                                          ? Colors.white
+                                          : Colors.black),
+                                ),
+                              ),
+                              1: Text(
+                                "Khusus",
+                                style: TextStyle(
+                                    color: (groupValue == 1)
+                                        ? Colors.white
+                                        : Colors.black),
+                              )
+                            },
+                            onValueChanged: (value) {
+                              setState(() => groupValue = value as int);
+                            },
+                            groupValue: groupValue,
+                            thumbColor: Color(0xFFFF8C00).withOpacity(0.8),
+                            backgroundColor: Colors.white,
+                          ),
                         ),
                       ),
                     ],

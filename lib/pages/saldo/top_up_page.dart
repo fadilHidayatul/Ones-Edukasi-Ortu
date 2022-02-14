@@ -403,7 +403,7 @@ class _TopUpPageState extends State<TopUpPage> {
                                             CupertinoAlertDialog(
                                           title: Text("Error"),
                                           content: Text(
-                                            "Isi bukti Top Up terlebih dahulu",
+                                            "Isi bukti Transfer terlebih dahulu",
                                           ),
                                         ),
                                       );
@@ -452,5 +452,12 @@ class _TopUpPageState extends State<TopUpPage> {
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _nominalctr.dispose();
+    _dummycon1.dispose();
+    super.dispose();
   }
 }

@@ -9,6 +9,7 @@ import 'package:edu_ready/pages/absensi/absensi_page.dart';
 import 'package:edu_ready/pages/akademik/akademik_page.dart';
 import 'package:edu_ready/pages/batasmateri/batas_materi_page.dart';
 import 'package:edu_ready/pages/informasi/informasi_page.dart';
+import 'package:edu_ready/pages/pembayaran/pembayaran_page.dart';
 import 'package:edu_ready/pages/saldo/history_saldo_page.dart';
 import 'package:edu_ready/pages/saldo/top_up_page.dart';
 import 'package:edu_ready/pages/welcome/login_page.dart';
@@ -569,7 +570,7 @@ class _HomePageState extends State<HomePage> {
                                                   padding: const EdgeInsets.all(
                                                       10.0),
                                                   child: Image.asset(
-                                                    "assets/images/absensi.png",
+                                                    "assets/images/akademik.png",
                                                     width: 30,
                                                     height: 30,
                                                   ),
@@ -586,18 +587,23 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                       Column(
                                         children: [
-                                          ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(45),
-                                            child: Container(
-                                              color: Color(0xFFFF8C00),
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(10.0),
-                                                child: Image.asset(
-                                                  "assets/images/absensi.png",
-                                                  width: 30,
-                                                  height: 30,
+                                          GestureDetector(
+                                            onTap: () {
+                                              Navigator.pushNamed(context, PembayaranPage.pageRoute);
+                                            },
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(45),
+                                              child: Container(
+                                                color: Color(0xFFFF8C00),
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(10.0),
+                                                  child: Image.asset(
+                                                    "assets/images/absensi.png",
+                                                    width: 30,
+                                                    height: 30,
+                                                  ),
                                                 ),
                                               ),
                                             ),

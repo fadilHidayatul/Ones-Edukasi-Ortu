@@ -4,6 +4,7 @@ import 'package:edu_ready/pages/absensi/absensi_page.dart';
 import 'package:edu_ready/pages/akademik/akademik_page.dart';
 import 'package:edu_ready/pages/batasmateri/batas_materi_page.dart';
 import 'package:edu_ready/pages/informasi/informasi_page.dart';
+import 'package:edu_ready/pages/pembayaran/pembayaran_page.dart';
 import 'package:edu_ready/pages/saldo/top_up_page.dart';
 import 'package:edu_ready/pages/welcome/home_page.dart';
 import 'package:edu_ready/pages/saldo/history_saldo_page.dart';
@@ -82,6 +83,7 @@ class MyApp extends StatelessWidget {
           InformasiPage.pageRoute: (context) => InformasiPage(),
           AkademikPage.pageRoute: (context) => AkademikPage(),
           TopUpPage.pageRoute : (context) => TopUpPage(),
+          PembayaranPage.pageRoute : (context) => PembayaranPage(),
         },
       ),
     );
