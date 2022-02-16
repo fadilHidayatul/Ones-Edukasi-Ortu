@@ -385,7 +385,8 @@ class _HomePageState extends State<HomePage> {
                                   children: [
                                     IconButton(
                                         onPressed: () {
-                                          Navigator.pushNamed(context, TopUpPage.pageRoute);
+                                          Navigator.pushNamed(
+                                              context, TopUpPage.pageRoute);
                                         },
                                         icon: Icon(
                                           CupertinoIcons.tray_arrow_down,
@@ -578,8 +579,13 @@ class _HomePageState extends State<HomePage> {
                                               ),
                                             ),
                                             onTap: () {
-                                              Navigator.pushNamed(context,
-                                                  AkademikPage.pageRoute);
+                                              Navigator.push(
+                                                context,
+                                                CupertinoPageRoute(
+                                                  builder: (context) =>
+                                                      AkademikPage(),
+                                                ),
+                                              );
                                             },
                                           ),
                                           Text("Akademik")
@@ -589,7 +595,13 @@ class _HomePageState extends State<HomePage> {
                                         children: [
                                           GestureDetector(
                                             onTap: () {
-                                              Navigator.pushNamed(context, PembayaranPage.pageRoute);
+                                              Navigator.push(
+                                                context,
+                                                CupertinoPageRoute(
+                                                  builder: (context) =>
+                                                      PembayaranPage(),
+                                                ),
+                                              );
                                             },
                                             child: ClipRRect(
                                               borderRadius:
@@ -597,8 +609,8 @@ class _HomePageState extends State<HomePage> {
                                               child: Container(
                                                 color: Color(0xFFFF8C00),
                                                 child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(10.0),
+                                                  padding: const EdgeInsets.all(
+                                                      10.0),
                                                   child: Image.asset(
                                                     "assets/images/absensi.png",
                                                     width: 30,
@@ -631,8 +643,13 @@ class _HomePageState extends State<HomePage> {
                                               ),
                                             ),
                                             onTap: () {
-                                              Navigator.pushNamed(context,
-                                                  InformasiPage.pageRoute);
+                                              Navigator.push(
+                                                context,
+                                                CupertinoPageRoute(
+                                                  builder: (context) =>
+                                                      InformasiPage(),
+                                                ),
+                                              );
                                             },
                                           ),
                                           Text("Informasi")
@@ -658,8 +675,13 @@ class _HomePageState extends State<HomePage> {
                                               ),
                                             ),
                                             onTap: () {
-                                              Navigator.pushNamed(context,
-                                                  AbsensiPage.pageRoute);
+                                              Navigator.push(
+                                                context,
+                                                CupertinoPageRoute(
+                                                  builder: (context) =>
+                                                      AbsensiPage(),
+                                                ),
+                                              );
                                             },
                                           ),
                                           Text("Absensi")

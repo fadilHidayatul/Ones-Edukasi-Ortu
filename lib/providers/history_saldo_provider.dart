@@ -55,11 +55,11 @@ class HistorySaldoProvider with ChangeNotifier {
       if (response.statusCode == 200) {
         var decodeData = json.decode(response.body);
         list.add(HistorySaldo.fromJson(decodeData));
-        print("load more success");
+        // print("load more success");
 
-        notifyListeners();
+        notifyListeners();  
       } else {
-        print("load more error");
+        // print("load more error");
         throw (jsonEncode(response.body));
       }
     } catch (e) {
