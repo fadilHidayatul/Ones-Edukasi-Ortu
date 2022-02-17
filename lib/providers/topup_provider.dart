@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:edu_ready/main.dart';
 import 'package:edu_ready/model/user.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -9,7 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class TopupProvider with ChangeNotifier {
   String masterurl =
-      "https://api-develop.ones-edu.com/api/v1/top-up/pitimasuak";
+      "${MyApp.domain}/api/v1/top-up/pitimasuak";
 
   senddatatopup(int uang, File imageBukti) async {
     SharedPreferences sp = await SharedPreferences.getInstance();

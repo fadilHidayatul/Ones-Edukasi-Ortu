@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:edu_ready/main.dart';
 import 'package:edu_ready/model/akademik_khusus.dart';
 import 'package:edu_ready/model/akademik_umum.dart';
 import 'package:edu_ready/model/user.dart';
@@ -14,11 +15,11 @@ class AkademikProvider with ChangeNotifier {
   List<AkademikKhusus> get listakakhusus => _list2;
 
   String urlUmum =
-      "https://api-develop.ones-edu.com/api/v1/list-nilai-akademik-anak";
+      "${MyApp.domain}/api/v1/list-nilai-akademik-anak";
   int lastpage = 0;
 
   String urlKhusus =
-      "https://api-develop.ones-edu.com/api/v1/list-nilai-tahfis-anak";
+      "${MyApp.domain}/api/v1/list-nilai-tahfis-anak";
   int lastpagekhusus = 0;
 
   String token = "";

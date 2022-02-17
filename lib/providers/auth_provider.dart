@@ -1,12 +1,13 @@
 import 'dart:convert';
 
+import 'package:edu_ready/main.dart';
 import 'package:edu_ready/model/user.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthProvider with ChangeNotifier {
-  Uri urlMaster = Uri.parse("https://api-develop.ones-edu.com/api/v1/login");
+  Uri urlMaster = Uri.parse("${MyApp.domain}/api/v1/login");
   // Uri urlMaster = Uri.parse("https://spas.ones-edu.com/getting/api/v1/login");
 
   Future<void> loginUser(username, password) async {

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:edu_ready/main.dart';
 import 'package:edu_ready/model/informasi.dart';
 import 'package:edu_ready/model/user.dart';
 import 'package:flutter/material.dart';
@@ -12,10 +13,10 @@ class InformasiProvider with ChangeNotifier {
   final List<Informasi> _list = [];
   List<Informasi> get listInformasi => _list;
   
-  String masterURL = "https://api-develop.ones-edu.com/api/v1/list-informasi-umum-andro";
-  String singleUrl = "https://api-develop.ones-edu.com/api/v1/informasi/informasi-detail";
+  String masterURL = "${MyApp.domain}/api/v1/list-informasi-umum-andro";
+  String singleUrl = "${MyApp.domain}/api/v1/informasi/informasi-detail";
 
-  var token;
+  String token = "";
 
   Future<void> getalllistinformasi() async {
     Uri url = Uri.parse(masterURL);
@@ -23,7 +24,7 @@ class InformasiProvider with ChangeNotifier {
     SharedPreferences sp = await SharedPreferences.getInstance();
     Map<String,dynamic> user = json.decode(sp.getString('user') ?? "");
     var getUser = User.fromJson(user);
-    token = getUser.data!.token;
+    token = getUser.data!.token!;
 
     Map<String,String> headers = {
       "Authorization" : "Bearer $token",

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:edu_ready/main.dart';
 import 'package:edu_ready/model/dashboard.dart';
 import 'package:edu_ready/model/user.dart';
 import 'package:flutter/foundation.dart';
@@ -12,7 +13,7 @@ class DashboardProvider with ChangeNotifier {
   List<Dashboard> get getDashboard => _list;
 
   Uri urlMaster =
-      Uri.parse("https://api-develop.ones-edu.com/api/v1/dashboardAndroFix");
+      Uri.parse("${MyApp.domain}/api/v1/dashboardAndroFix");
   // Uri urlMaster =
   //     Uri.parse("https://spas.ones-edu.com/getting/api/v1/dashboardAndroFix");
   String token = "";

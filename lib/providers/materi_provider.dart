@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:edu_ready/main.dart';
 import 'package:edu_ready/model/mapel.dart';
 import 'package:edu_ready/model/user.dart';
 import 'package:flutter/foundation.dart';
@@ -13,7 +14,7 @@ class MateriProvider with ChangeNotifier {
 
 
   String urlmaster =
-      "https://api-develop.ones-edu.com/api/v1/list-batas-materi-Anakku-Detail";
+      "${MyApp.domain}/api/v1/list-batas-materi-Anakku-Detail";
   int lastPageMP = 0;
 
   Future<void> getfirstmapel() async {

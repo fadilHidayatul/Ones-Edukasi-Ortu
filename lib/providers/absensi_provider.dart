@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:edu_ready/main.dart';
 import 'package:edu_ready/model/absensi_bulanan.dart';
 import 'package:edu_ready/model/absensi_harian.dart';
 import 'package:edu_ready/model/user.dart';
@@ -13,9 +14,9 @@ class AbsensiProvider with ChangeNotifier {
   final List<AbsensiBulanan> _listbulanan = [];
   List<AbsensiBulanan> get listabsensibulanan => _listbulanan;
 
-  String urlHarian = "https://api-develop.ones-edu.com/api/v1/list-absen-anak";
+  String urlHarian = "${MyApp.domain}/api/v1/list-absen-anak";
   String urlBulanan =
-      "https://api-develop.ones-edu.com/api/v1/list-absen-anak-andro";
+      "${MyApp.domain}/api/v1/list-absen-anak-andro";
 
   String token = "";
   String idOrtu = "";

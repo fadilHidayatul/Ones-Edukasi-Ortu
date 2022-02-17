@@ -47,7 +47,7 @@ class _PembayaranPageState extends State<PembayaranPage> {
     _controllerBayar.addListener(() {
       if (_controllerBayar.position.pixels ==
           _controllerBayar.position.maxScrollExtent) {
-        _getmore();
+        _getmorepembayaran ();
       }
     });
     super.didChangeDependencies();
@@ -76,7 +76,7 @@ class _PembayaranPageState extends State<PembayaranPage> {
     });
   }
 
-  _getmore() {
+  _getmorepembayaran() {
     var prov = Provider.of<PembayaranProvider>(context, listen: false);
 
     if (page < lastpage) {

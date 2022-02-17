@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:edu_ready/main.dart';
 import 'package:edu_ready/model/pembayaran.dart';
 import 'package:edu_ready/model/user.dart';
 import 'package:flutter/material.dart';
@@ -11,9 +12,10 @@ class PembayaranProvider with ChangeNotifier {
   List<Pembayaran> get listpembayaran => _listbayar;
 
   String urlmaster =
-      "https://api-develop.ones-edu.com/api/v1/alokasi-pembayaran-search-gani";
+      "${MyApp.domain}/api/v1/alokasi-pembayaran-search-gani";
   String urlPost =
       "https://api-develop.ones-edu.com/api/v1/pembayaran-siswa/storeAndro";
+  String urlriwayat = "";
   String token = "";
   String idortu = "";
 
@@ -35,8 +37,6 @@ class PembayaranProvider with ChangeNotifier {
 
         var decodeData = json.decode(response.body);
         _listbayar.add(Pembayaran.fromJson(decodeData));
-
-        // print(decodeData);
 
         notifyListeners();
       } else {
@@ -68,8 +68,7 @@ class PembayaranProvider with ChangeNotifier {
     }
   }
 
-  Future<void> sendRingkasanPembayaran(
-      List<Map<String, dynamic>> arrayItem) async {
+  Future<void> sendRingkasanPembayaran(List<Map<String, dynamic>> arrayItem) async {
     Map<String, String> headers = {
       "Authorization": "Bearer $token",
       "Content-Type": "application/json",
@@ -89,6 +88,22 @@ class PembayaranProvider with ChangeNotifier {
         // print("${json.decode(response.body)["message"]}");
         throw (json.decode(response.body)["message"]);
       }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> getfirstriwayatpembayaran() async {
+    SharedPreferences sp = await SharedPreferences.getInstance();
+    Map<String,dynamic> user = json.decode(sp.getString('user') ?? "");
+    var getuser = User.fromJson(user);
+    var token = getuser.data?.token;
+    var idortu = getuser.data?.user?.idnya;
+
+    Map<String,String> headers = {"Authorization" : "Bearer $token"};
+
+    try {
+      
     } catch (e) {
       rethrow;
     }

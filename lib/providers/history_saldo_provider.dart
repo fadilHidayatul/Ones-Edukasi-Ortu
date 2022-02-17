@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:edu_ready/main.dart';
 import 'package:edu_ready/model/history_saldo.dart';
 import 'package:edu_ready/model/user.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +12,7 @@ class HistorySaldoProvider with ChangeNotifier {
   List<HistorySaldo> get listHistory => list;
 
   String url =
-      "https://api-develop.ones-edu.com/api/v1/top-up/HistoryCall?page=";
+      "${MyApp.domain}/api/v1/top-up/HistoryCall?page=";
   String token = "";
 
   int page = 1;

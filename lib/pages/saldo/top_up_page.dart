@@ -266,6 +266,7 @@ class _TopUpPageState extends State<TopUpPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.end,
+                      mainAxisSize: MainAxisSize.max,
                       children: [
                         Text(
                           "Catatan",
