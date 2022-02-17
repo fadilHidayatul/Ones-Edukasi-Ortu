@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:edu_ready/main.dart';
 import 'package:edu_ready/model/pembayaran.dart';
+import 'package:edu_ready/model/riwayat_pembayaran.dart';
 import 'package:edu_ready/model/user.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -11,11 +12,12 @@ class PembayaranProvider with ChangeNotifier {
   final List<Pembayaran> _listbayar = [];
   List<Pembayaran> get listpembayaran => _listbayar;
 
-  String urlmaster =
-      "${MyApp.domain}/api/v1/alokasi-pembayaran-search-gani";
-  String urlPost =
-      "https://api-develop.ones-edu.com/api/v1/pembayaran-siswa/storeAndro";
-  String urlriwayat = "";
+  final List<RiwayatPembayaran> _listriwayat = [];
+  List<RiwayatPembayaran> get listriwayatbayar => _listriwayat;
+
+  String urlmaster = "${MyApp.domain}/api/v1/alokasi-pembayaran-search-gani";
+  String urlPost = "${MyApp.domain}/api/v1/pembayaran-siswa/storeAndro";
+  String urlriwayat = "${MyApp.domain}/api/v1/riwayat-pembayaran-andro";
   String token = "";
   String idortu = "";
 
@@ -68,7 +70,8 @@ class PembayaranProvider with ChangeNotifier {
     }
   }
 
-  Future<void> sendRingkasanPembayaran(List<Map<String, dynamic>> arrayItem) async {
+  Future<void> sendRingkasanPembayaran(
+      List<Map<String, dynamic>> arrayItem) async {
     Map<String, String> headers = {
       "Authorization": "Bearer $token",
       "Content-Type": "application/json",
@@ -80,7 +83,7 @@ class PembayaranProvider with ChangeNotifier {
     try {
       var response =
           await http.post(url, body: json.encode(body), headers: headers);
-      if (response.statusCode>= 200 && response.statusCode < 300) {
+      if (response.statusCode >= 200 && response.statusCode < 300) {
         // print("Berhasil kirim data ke API");
 
         notifyListeners();
@@ -95,15 +98,51 @@ class PembayaranProvider with ChangeNotifier {
 
   Future<void> getfirstriwayatpembayaran() async {
     SharedPreferences sp = await SharedPreferences.getInstance();
-    Map<String,dynamic> user = json.decode(sp.getString('user') ?? "");
+    Map<String, dynamic> user = json.decode(sp.getString('user') ?? "");
     var getuser = User.fromJson(user);
-    var token = getuser.data?.token;
-    var idortu = getuser.data?.user?.idnya;
+    token = getuser.data!.token!;
+    idortu = getuser.data!.user!.idnya!;
 
-    Map<String,String> headers = {"Authorization" : "Bearer $token"};
+    Map<String, String> headers = {"Authorization": "Bearer $token"};
+
+    Uri url = Uri.parse("$urlriwayat?ortu=$idortu&page=1");
 
     try {
-      
+      var response = await http.get(url, headers: headers);
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        _listriwayat.clear();
+
+        var decodeData = json.decode(response.body);
+        _listriwayat.add(RiwayatPembayaran.fromJson(decodeData));
+
+        notifyListeners();
+      } else {
+        // print("${json.decode(response.body)["message"]}");
+        throw (json.decode(response.body)["message"]);
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> getmoreriwayatpembayaran(int page) async {
+    Map<String,String> headers = {"Authorization" : "Bearer $token"};
+
+    Uri url = Uri.parse("$urlriwayat?ortu=$idortu&page=$page");
+
+    try {
+      var response = await http.get(url,headers: headers);
+      if (response.statusCode >=200 && response.statusCode < 300) {
+
+        var decodeData = json.decode(response.body);
+        _listriwayat.add(RiwayatPembayaran.fromJson(decodeData));
+
+
+        notifyListeners();
+      }else{
+        print("${json.decode(response.body)["message"]}");
+        throw (json.decode(response.body)["message"]);
+      }
     } catch (e) {
       rethrow;
     }

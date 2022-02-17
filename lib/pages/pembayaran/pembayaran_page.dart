@@ -1,14 +1,15 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:edu_ready/model/pembayaran.dart';
+import 'package:edu_ready/model/riwayat_pembayaran.dart';
 import 'package:edu_ready/providers/pembayaran_provider.dart';
 import 'package:edu_ready/utils/currency.dart';
 import 'package:edu_ready/utils/string_cap.dart';
 import 'package:edu_ready/widgets/card_appbar_widget.dart';
+import 'package:edu_ready/widgets/no_data_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -23,31 +24,44 @@ class PembayaranPage extends StatefulWidget {
 
 class _PembayaranPageState extends State<PembayaranPage> {
   final ScrollController _controllerBayar = ScrollController();
+  final ScrollController _controllerRiwayat = ScrollController();
 
   int groupvalue = 0;
   int tempTotal = 0;
   int page = 0;
   int lastpage = 0;
+  int pageRiwayat = 0;
+  int lastPageRiwayat = 0;
 
   bool firstinit = true;
   bool loadingconfirm = false;
+  bool stoploadmore = false;
 
   List<bool> isChecked = [];
   List<DatumBayar> allbayar = [];
   List<DatumBayar> selectedBayar = [];
   List<Map<String, dynamic>> sendToAPI = [];
+  List<DatumRiwayatBayar> allriwayat = [];
 
   @override
   void didChangeDependencies() {
     if (firstinit) {
       _getfirstpembayaran();
+      _getfirstriwayatpembayaran();
       firstinit = false;
     }
 
     _controllerBayar.addListener(() {
       if (_controllerBayar.position.pixels ==
           _controllerBayar.position.maxScrollExtent) {
-        _getmorepembayaran ();
+        _getmorepembayaran();
+      }
+    });
+
+    _controllerRiwayat.addListener(() {
+      if (_controllerRiwayat.position.pixels ==
+          _controllerRiwayat.position.maxScrollExtent) {
+        _getmoreriwayatpembayaran();
       }
     });
     super.didChangeDependencies();
@@ -81,20 +95,61 @@ class _PembayaranPageState extends State<PembayaranPage> {
 
     if (page < lastpage) {
       prov.getmorepembayaran(page + 2).then((value) {
-        var newdata = prov.listpembayaran[page + 1].data;
+        var newdata = prov.listpembayaran[page + 1].data!;
 
-        var iteration = 0;
-        for (var i = allbayar.length;
-            i < allbayar.length + newdata!.length;
-            i++) {
-          allbayar.add(newdata[iteration]);
-          iteration++;
+        for (var element in newdata) {
+          allbayar.add(element);
         }
         page++;
 
         setState(() {});
       }).catchError((onError) {
         print("error load more");
+      });
+    }
+  }
+
+  _getfirstriwayatpembayaran() {
+    var prov = Provider.of<PembayaranProvider>(context, listen: false);
+
+    prov.getfirstriwayatpembayaran().then((value) {
+      if (prov.listriwayatbayar.isNotEmpty) {
+        allriwayat.clear();
+        lastPageRiwayat = prov.listriwayatbayar[pageRiwayat].lastPage!;
+
+        for (var element in prov.listriwayatbayar[pageRiwayat].data!) {
+          allriwayat.add(element);
+        }
+
+        ///ini untuk ambil page 1+1
+        pageRiwayat++;
+        setState(() {});
+      }
+    }).catchError((onError) {
+      print("Error riwayat : $onError");
+    });
+  }
+
+  _getmoreriwayatpembayaran() async {
+    var prov = Provider.of<PembayaranProvider>(context, listen: false);
+
+    if (pageRiwayat < lastPageRiwayat) {
+      await prov.getmoreriwayatpembayaran(pageRiwayat + 1).then((value) {
+        var newdata = prov.listriwayatbayar[pageRiwayat].data!;
+
+        for (var element in newdata) {
+          allriwayat.add(element);
+        }
+        pageRiwayat++;
+
+        setState(() {});
+      }).catchError((onError) {
+        print("ERror saat page $pageRiwayat  =  $onError");
+      });
+      pageRiwayat++;
+    } else {
+      setState(() {
+        stoploadmore = true;
       });
     }
   }
@@ -151,503 +206,586 @@ class _PembayaranPageState extends State<PembayaranPage> {
           ),
 
           (groupvalue == 0)
-              ? Expanded(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      Expanded(
-                        child: SizedBox(
-                          height: double.infinity,
-                          width: double.infinity,
-                          child: ListView.builder(
-                            controller: _controllerBayar,
-                            shrinkWrap: true,
-                            itemCount: allbayar.length,
-                            itemBuilder: (context, index) {
-                              return Card(
-                                color: Colors.white.withOpacity(0.85),
-                                margin: EdgeInsets.symmetric(
-                                  vertical: 6,
-                                  horizontal: 8,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                child: Padding(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(0, 4, 4, 4),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: [
-                                      Flexible(
-                                        flex: 1,
-                                        child: SizedBox(
-                                          width: double.infinity,
-                                          child: CheckboxListTile(
-                                            contentPadding: EdgeInsets.all(0),
-                                            activeColor: Color(0xFFFF8C00)
-                                                .withOpacity(0.7),
-                                            visualDensity:
-                                                VisualDensity.compact,
-                                            value: isChecked[index],
-                                            onChanged: (value) {
-                                              setState(() {
-                                                isChecked[index] = value!;
+              ? (allbayar.isEmpty)
+                  ? Expanded(
+                      child: NoDataWidget(message: "Tidak ada data pembayaran"),
+                    )
+                  : Expanded(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          Expanded(
+                            child: SizedBox(
+                              height: double.infinity,
+                              width: double.infinity,
+                              child: ListView.builder(
+                                controller: _controllerBayar,
+                                shrinkWrap: true,
+                                itemCount: allbayar.length,
+                                itemBuilder: (context, index) {
+                                  return Card(
+                                    color: Colors.white.withOpacity(0.85),
+                                    margin: EdgeInsets.symmetric(
+                                      vertical: 6,
+                                      horizontal: 8,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: Padding(
+                                      padding:
+                                          const EdgeInsets.fromLTRB(0, 4, 4, 4),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.max,
+                                        children: [
+                                          Flexible(
+                                            flex: 1,
+                                            child: SizedBox(
+                                              width: double.infinity,
+                                              child: CheckboxListTile(
+                                                contentPadding:
+                                                    EdgeInsets.all(0),
+                                                activeColor: Color(0xFFFF8C00)
+                                                    .withOpacity(0.7),
+                                                visualDensity:
+                                                    VisualDensity.compact,
+                                                value: isChecked[index],
+                                                onChanged: (value) {
+                                                  setState(() {
+                                                    isChecked[index] = value!;
 
-                                                if (isChecked[index] == true) {
-                                                  selectedBayar
-                                                      .add(allbayar[index]);
+                                                    if (isChecked[index] ==
+                                                        true) {
+                                                      selectedBayar
+                                                          .add(allbayar[index]);
 
-                                                  tempTotal +=
-                                                      allbayar[index].nominal!;
-
-                                                  Map<String, dynamic> mapping =
-                                                      {
-                                                    "nominal":
-                                                        allbayar[index].nominal,
-                                                    "idakun": allbayar[index]
-                                                        .alokasiid,
-                                                    "id":
-                                                        allbayar[index].idsiswaa
-                                                  };
-                                                  sendToAPI.add(mapping);
-                                                } else {
-                                                  selectedBayar.removeWhere(
-                                                      (element) =>
-                                                          element.alokasiid ==
+                                                      tempTotal +=
                                                           allbayar[index]
-                                                              .alokasiid);
+                                                              .nominal!;
 
-                                                  tempTotal -=
-                                                      allbayar[index].nominal!;
-
-                                                  sendToAPI.removeWhere(
-                                                      (element) =>
-                                                          element.containsValue(
+                                                      Map<String, dynamic>
+                                                          mapping = {
+                                                        "nominal":
+                                                            allbayar[index]
+                                                                .nominal,
+                                                        "idakun":
+                                                            allbayar[index]
+                                                                .alokasiid,
+                                                        "id": allbayar[index]
+                                                            .idsiswaa
+                                                      };
+                                                      sendToAPI.add(mapping);
+                                                    } else {
+                                                      selectedBayar.removeWhere(
+                                                          (element) =>
+                                                              element
+                                                                  .alokasiid ==
                                                               allbayar[index]
-                                                                  .nominal));
-                                                }
-                                              });
-                                            },
-                                          ),
-                                        ),
-                                      ),
-                                      Flexible(
-                                        flex: 5,
-                                        child: SizedBox(
-                                          width: double.infinity,
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                allbayar[index].judul!,
+                                                                  .alokasiid);
+
+                                                      tempTotal -=
+                                                          allbayar[index]
+                                                              .nominal!;
+
+                                                      sendToAPI.removeWhere(
+                                                          (element) => element
+                                                              .containsValue(
+                                                                  allbayar[
+                                                                          index]
+                                                                      .nominal));
+                                                    }
+                                                  });
+                                                },
                                               ),
-                                              Text(
-                                                (allbayar[index].tipeid == 1)
-                                                    ? "Semester : " +
-                                                        "${allbayar[index].tipesemester}"
-                                                            .capitalize()
-                                                    : (allbayar[index].tipeid ==
-                                                            2)
-                                                        ? "Bulan : " +
-                                                            "${allbayar[index].nambul}"
+                                            ),
+                                          ),
+                                          Flexible(
+                                            flex: 5,
+                                            child: SizedBox(
+                                              width: double.infinity,
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    allbayar[index].judul!,
+                                                  ),
+                                                  Text(
+                                                    (allbayar[index].tipeid ==
+                                                            1)
+                                                        ? "Semester : " +
+                                                            "${allbayar[index].tipesemester}"
                                                                 .capitalize()
-                                                        : "Uang Tahunan",
-                                                softWrap: true,
+                                                        : (allbayar[index]
+                                                                    .tipeid ==
+                                                                2)
+                                                            ? "Bulan : " +
+                                                                "${allbayar[index].nambul}"
+                                                                    .capitalize()
+                                                            : "Uang Tahunan",
+                                                    softWrap: true,
+                                                  ),
+                                                ],
                                               ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      Flexible(
-                                        flex: 2,
-                                        child: SizedBox(
-                                          width: double.infinity,
-                                          child: Text(
-                                            CurrencyFormat.convertToIdr(
-                                              allbayar[index].nominal,
-                                              0,
-                                            ),
-                                            softWrap: true,
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w600,
                                             ),
                                           ),
-                                        ),
+                                          Flexible(
+                                            flex: 2,
+                                            child: SizedBox(
+                                              width: double.infinity,
+                                              child: Text(
+                                                CurrencyFormat.convertToIdr(
+                                                  allbayar[index].nominal,
+                                                  0,
+                                                ),
+                                                softWrap: true,
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                    ],
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+
+                          ////bagian card total
+                          Card(
+                            color: Colors.white.withOpacity(0.85),
+                            margin: EdgeInsets.fromLTRB(10, 2, 10, 8),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(9),
+                            ),
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 12),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "Total Bayar : ${CurrencyFormat.convertToIdr(tempTotal, 0)}",
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.symmetric(vertical: 8),
+                                    child: CupertinoButton(
+                                      onPressed: () {
+                                        if (selectedBayar.isEmpty) {
+                                          showCupertinoDialog(
+                                            barrierDismissible: true,
+                                            context: context,
+                                            builder: (context) {
+                                              return CupertinoAlertDialog(
+                                                title: Text("Oops!"),
+                                                content: Text(
+                                                  "Silahkan pilih pembayaran terlebih dahulu",
+                                                ),
+                                              );
+                                            },
+                                          );
+                                        } else {
+                                          selectedBayar.sort((a, b) => a
+                                              .alokasiid!
+                                              .compareTo(b.alokasiid!));
+
+                                          AwesomeDialog(
+                                            context: context,
+                                            animType: AnimType.BOTTOMSLIDE,
+                                            dialogType: DialogType.NO_HEADER,
+                                            showCloseIcon: true,
+                                            body: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.max,
+                                                  children: const [
+                                                    Text(
+                                                      "Ringkasan Pembayaran",
+                                                      style: TextStyle(
+                                                        fontSize: 13,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                Container(
+                                                  width: double.infinity,
+                                                  height: 0.3,
+                                                  color: Colors.black,
+                                                  margin: EdgeInsets.symmetric(
+                                                    vertical: 4,
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  width: double.infinity,
+                                                  height: MediaQuery.of(context)
+                                                          .size
+                                                          .height *
+                                                      0.4,
+                                                  child: ListView.builder(
+                                                    itemCount:
+                                                        selectedBayar.length,
+                                                    itemBuilder:
+                                                        (context, index) {
+                                                      return Padding(
+                                                        padding:
+                                                            EdgeInsets.fromLTRB(
+                                                                10, 8, 5, 8),
+                                                        child: Row(
+                                                          mainAxisSize:
+                                                              MainAxisSize.max,
+                                                          children: [
+                                                            Flexible(
+                                                              flex: 2,
+                                                              child: SizedBox(
+                                                                width: double
+                                                                    .infinity,
+                                                                child: Text(
+                                                                  selectedBayar[
+                                                                          index]
+                                                                      .judul!,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            Flexible(
+                                                              flex: 1,
+                                                              child: SizedBox(
+                                                                width: double
+                                                                    .infinity,
+                                                                child: Text(
+                                                                  CurrencyFormat.convertToIdr(
+                                                                      selectedBayar[
+                                                                              index]
+                                                                          .nominal,
+                                                                      0),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      );
+                                                    },
+                                                  ),
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    Flexible(
+                                                      flex: 3,
+                                                      child: Container(
+                                                        width: double.infinity,
+                                                        margin:
+                                                            EdgeInsets.fromLTRB(
+                                                                10, 5, 10, 5),
+                                                        child: Text(
+                                                          "Jumlah Pembayaran",
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Flexible(
+                                                      flex: 2,
+                                                      child: Container(
+                                                        width: double.infinity,
+                                                        margin:
+                                                            EdgeInsets.fromLTRB(
+                                                                10, 5, 5, 5),
+                                                        child: Text(
+                                                          CurrencyFormat
+                                                              .convertToIdr(
+                                                                  tempTotal, 0),
+                                                          style: TextStyle(
+                                                            fontSize: 15,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            color: Colors.red
+                                                                .withOpacity(
+                                                                    0.7),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                Container(
+                                                  width: double.infinity,
+                                                  height: 0.3,
+                                                  color: Colors.black,
+                                                  margin: EdgeInsets.symmetric(
+                                                    vertical: 4,
+                                                  ),
+                                                ),
+                                                Center(
+                                                  child: Text(
+                                                    "Transfer ke",
+                                                    style:
+                                                        TextStyle(fontSize: 13),
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  width: double.infinity,
+                                                  child: Text(
+                                                    "Rekening Sekolah\na/n",
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                ),
+                                                Padding(
+                                                  padding:
+                                                      EdgeInsets.only(top: 6),
+                                                  child: Center(
+                                                    child: Text(selectedBayar[0]
+                                                        .deskripsi!),
+                                                  ),
+                                                ),
+                                                Padding(
+                                                  padding: EdgeInsets.only(
+                                                      bottom: 6),
+                                                  child: Center(
+                                                    child: Text(
+                                                      selectedBayar[0].norek!,
+                                                      style: TextStyle(
+                                                          fontSize: 15,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                  ),
+                                                ),
+                                                Container(
+                                                  width: double.infinity,
+                                                  alignment: Alignment.center,
+                                                  margin: EdgeInsets.symmetric(
+                                                    vertical: 12,
+                                                  ),
+                                                  child: CupertinoButton(
+                                                    minSize: 0,
+                                                    color: Color(0xFFFF8C00)
+                                                        .withOpacity(0.7),
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                      vertical: 12,
+                                                      horizontal: 24,
+                                                    ),
+                                                    child: (loadingconfirm)
+                                                        ? CupertinoActivityIndicator()
+                                                        : Text(
+                                                            "KONFIRMASI",
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.white,
+                                                            ),
+                                                          ),
+                                                    onPressed: (loadingconfirm)
+                                                        ? null
+                                                        : () {
+                                                            setState(() {
+                                                              loadingconfirm =
+                                                                  true;
+                                                            });
+
+                                                            Provider.of<PembayaranProvider>(
+                                                                    context,
+                                                                    listen:
+                                                                        false)
+                                                                .sendRingkasanPembayaran(
+                                                                    sendToAPI)
+                                                                .then((value) {
+                                                              setState(() {
+                                                                loadingconfirm =
+                                                                    false;
+                                                              });
+                                                              _getfirstpembayaran();
+                                                              Navigator.pop(
+                                                                  context);
+                                                              showCupertinoDialog(
+                                                                context:
+                                                                    context,
+                                                                builder:
+                                                                    (context) {
+                                                                  Timer(
+                                                                      Duration(
+                                                                          seconds:
+                                                                              3),
+                                                                      () => Navigator
+                                                                          .pop(
+                                                                              context));
+                                                                  return CupertinoAlertDialog(
+                                                                    content: Text(
+                                                                        "Pembayaran berhasil dilakukan"),
+                                                                  );
+                                                                },
+                                                              );
+                                                            }).catchError(
+                                                                    (onError) {
+                                                              showCupertinoDialog(
+                                                                context:
+                                                                    context,
+                                                                builder:
+                                                                    (context) =>
+                                                                        CupertinoAlertDialog(
+                                                                  title: Text(
+                                                                      "Error"),
+                                                                  content: Text(
+                                                                      onError),
+                                                                ),
+                                                              );
+                                                            });
+                                                          },
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ).show();
+                                        }
+                                      },
+                                      child: Text(
+                                        "BAYAR",
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: 10,
+                                        horizontal: 16,
+                                      ),
+                                      minSize: 0,
+                                      color: Color(0xFFFF8C00).withOpacity(0.7),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+              : (allriwayat.isEmpty)
+                  ? Expanded(
+                      child:
+                          NoDataWidget(message: "TIdak ada riwayat pembayaran"),
+                    )
+                  : Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 9,
+                              horizontal: 12,
+                            ),
+                            child: Row(
+                              children: [
+                                Text("Siswa : "),
+                                Text(
+                                  allriwayat[0].namaSiswa!,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFFFF8C00),
                                   ),
                                 ),
-                              );
-                            },
+                              ],
+                            ),
                           ),
-                        ),
-                      ),
-
-                      ////bagian card total
-                      Card(
-                        color: Colors.white.withOpacity(0.85),
-                        margin: EdgeInsets.fromLTRB(10, 2, 10, 8),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(9),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.max,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "Total Bayar : ${CurrencyFormat.convertToIdr(tempTotal, 0)}",
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 8),
-                                child: CupertinoButton(
-                                  onPressed: () {
-                                    if (selectedBayar.isEmpty) {
-                                      showCupertinoDialog(
-                                        barrierDismissible: true,
-                                        context: context,
-                                        builder: (context) {
-                                          return CupertinoAlertDialog(
-                                            title: Text("Oops!"),
-                                            content: Text(
-                                              "Silahkan pilih pembayaran terlebih dahulu",
-                                            ),
-                                          );
-                                        },
-                                      );
-                                    } else {
-                                      selectedBayar.sort((a, b) =>
-                                          a.alokasiid!.compareTo(b.alokasiid!));
-
-                                      AwesomeDialog(
-                                        context: context,
-                                        animType: AnimType.BOTTOMSLIDE,
-                                        dialogType: DialogType.NO_HEADER,
-                                        showCloseIcon: true,
-                                        body: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              mainAxisSize: MainAxisSize.max,
-                                              children: const [
+                          Expanded(
+                            child: ListView.builder(
+                              controller: _controllerRiwayat,
+                              itemCount: allriwayat.length,
+                              itemBuilder: (context, index) {
+                                ///untuk pengecekan load more dibawah list
+                                var tot = index + 1;
+                                if (!stoploadmore) {
+                                  if (tot == allriwayat.length) {
+                                    return Padding(
+                                      padding:  EdgeInsets.symmetric(vertical: 4),
+                                      child: CupertinoActivityIndicator(),
+                                    );
+                                  }
+                                }
+                                return Card(
+                                  margin: EdgeInsets.fromLTRB(8, 2, 8, 12),
+                                  child: Padding(
+                                    padding: EdgeInsets.fromLTRB(10, 12, 3, 14),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      children: [
+                                        Flexible(
+                                          flex: 4,
+                                          child: SizedBox(
+                                            width: double.infinity,
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
                                                 Text(
-                                                  "Ringkasan Pembayaran",
+                                                  "No Kwitansi :",
+                                                  style:
+                                                      TextStyle(fontSize: 13),
+                                                ),
+                                                Divider(
+                                                  thickness: 0,
+                                                  color: Colors.transparent,
+                                                  height: 5,
+                                                ),
+                                                Text(
+                                                  allriwayat[index].nokwitansi!,
                                                   style: TextStyle(
-                                                    fontSize: 13,
                                                     fontWeight: FontWeight.bold,
                                                   ),
                                                 ),
                                               ],
                                             ),
-                                            Container(
-                                              width: double.infinity,
-                                              height: 0.3,
-                                              color: Colors.black,
-                                              margin: EdgeInsets.symmetric(
-                                                vertical: 4,
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              width: double.infinity,
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .height *
-                                                  0.4,
-                                              child: ListView.builder(
-                                                itemCount: selectedBayar.length,
-                                                itemBuilder: (context, index) {
-                                                  return Padding(
-                                                    padding:
-                                                        EdgeInsets.fromLTRB(
-                                                            10, 8, 5, 8),
-                                                    child: Row(
-                                                      mainAxisSize:
-                                                          MainAxisSize.max,
-                                                      children: [
-                                                        Flexible(
-                                                          flex: 2,
-                                                          child: SizedBox(
-                                                            width:
-                                                                double.infinity,
-                                                            child: Text(
-                                                              selectedBayar[
-                                                                      index]
-                                                                  .judul!,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        Flexible(
-                                                          flex: 1,
-                                                          child: SizedBox(
-                                                            width:
-                                                                double.infinity,
-                                                            child: Text(
-                                                              CurrencyFormat.convertToIdr(
-                                                                  selectedBayar[
-                                                                          index]
-                                                                      .nominal,
-                                                                  0),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  );
-                                                },
-                                              ),
-                                            ),
-                                            Row(
-                                              children: [
-                                                Flexible(
-                                                  flex: 3,
-                                                  child: Container(
-                                                    width: double.infinity,
-                                                    margin: EdgeInsets.fromLTRB(
-                                                        10, 5, 10, 5),
-                                                    child: Text(
-                                                      "Jumlah Pembayaran",
-                                                    ),
-                                                  ),
-                                                ),
-                                                Flexible(
-                                                  flex: 2,
-                                                  child: Container(
-                                                    width: double.infinity,
-                                                    margin: EdgeInsets.fromLTRB(
-                                                        10, 5, 5, 5),
-                                                    child: Text(
-                                                      CurrencyFormat
-                                                          .convertToIdr(
-                                                              tempTotal, 0),
-                                                      style: TextStyle(
-                                                        fontSize: 15,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.red
-                                                            .withOpacity(0.7),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            Container(
-                                              width: double.infinity,
-                                              height: 0.3,
-                                              color: Colors.black,
-                                              margin: EdgeInsets.symmetric(
-                                                vertical: 4,
-                                              ),
-                                            ),
-                                            Center(
-                                              child: Text(
-                                                "Transfer ke",
-                                                style: TextStyle(fontSize: 13),
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              width: double.infinity,
-                                              child: Text(
-                                                "Rekening Sekolah\na/n",
-                                                textAlign: TextAlign.center,
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding: EdgeInsets.only(top: 6),
-                                              child: Center(
-                                                child: Text(selectedBayar[0]
-                                                    .deskripsi!),
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding:
-                                                  EdgeInsets.only(bottom: 6),
-                                              child: Center(
-                                                child: Text(
-                                                  selectedBayar[0].norek!,
-                                                  style: TextStyle(
-                                                      fontSize: 15,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                              ),
-                                            ),
-                                            Container(
-                                              width: double.infinity,
-                                              alignment: Alignment.center,
-                                              margin: EdgeInsets.symmetric(
-                                                vertical: 12,
-                                              ),
-                                              child: CupertinoButton(
-                                                minSize: 0,
-                                                color: Color(0xFFFF8C00)
-                                                    .withOpacity(0.7),
-                                                padding: EdgeInsets.symmetric(
-                                                  vertical: 12,
-                                                  horizontal: 24,
-                                                ),
-                                                child: (loadingconfirm)
-                                                    ? CupertinoActivityIndicator()
-                                                    : Text(
-                                                        "KONFIRMASI",
-                                                        style: TextStyle(
-                                                          color: Colors.white,
-                                                        ),
-                                                      ),
-                                                onPressed: (loadingconfirm)
-                                                    ? null
-                                                    : () {
-                                                        setState(() {
-                                                          loadingconfirm = true;
-                                                        });
-
-                                                        Provider.of<PembayaranProvider>(
-                                                                context,
-                                                                listen: false)
-                                                            .sendRingkasanPembayaran(
-                                                                sendToAPI)
-                                                            .then((value) {
-                                                          setState(() {
-                                                            loadingconfirm =
-                                                                false;
-                                                          });
-                                                          _getfirstpembayaran();
-                                                          Navigator.pop(
-                                                              context);
-                                                          showCupertinoDialog(
-                                                            context: context,
-                                                            builder: (context) {
-                                                              Timer(
-                                                                  Duration(
-                                                                      seconds:
-                                                                          3),
-                                                                  () => Navigator
-                                                                      .pop(
-                                                                          context));
-                                                              return CupertinoAlertDialog(
-                                                                content: Text(
-                                                                    "Pembayaran berhasil dilakukan"),
-                                                              );
-                                                            },
-                                                          );
-                                                        }).catchError(
-                                                                (onError) {
-                                                          showCupertinoDialog(
-                                                            context: context,
-                                                            builder: (context) =>
-                                                                CupertinoAlertDialog(
-                                                              title:
-                                                                  Text("Error"),
-                                                              content:
-                                                                  Text(onError),
-                                                            ),
-                                                          );
-                                                        });
-                                                      },
-                                              ),
-                                            ),
-                                          ],
+                                          ),
                                         ),
-                                      ).show();
-                                    }
-                                  },
-                                  child: Text(
-                                    "BAYAR",
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                  padding: EdgeInsets.symmetric(
-                                    vertical: 10,
-                                    horizontal: 16,
-                                  ),
-                                  minSize: 0,
-                                  color: Color(0xFFFF8C00).withOpacity(0.7),
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              : Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 6,
-                          horizontal: 12,
-                        ),
-                        child: Text(
-                          "Nama siswa",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: 10,
-                          itemBuilder: (context, index) {
-                            return Card(
-                              margin: EdgeInsets.fromLTRB(8, 2, 8, 8),
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.fromLTRB(10, 12, 3, 12),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.max,
-                                  children: [
-                                    Flexible(
-                                      flex: 4,
-                                      child: SizedBox(
-                                        width: double.infinity,
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: const [
-                                            Text("No Kwitansi :"),
-                                            Text(
-                                              "K0912UIN123J89102JU6G7D3M",
+                                        Flexible(
+                                          flex: 3,
+                                          child: SizedBox(
+                                            width: double.infinity,
+                                            child: Text(
+                                              allriwayat[index].status ==
+                                                      "butuh konfirmasi"
+                                                  ? "Menunggu Konfirmasi"
+                                                  : allriwayat[index].status ==
+                                                          null
+                                                      ? "Ditolak"
+                                                      : "Lunas",
+                                              textAlign: TextAlign.center,
                                               style: TextStyle(
-                                                fontWeight: FontWeight.bold,
+                                                color: allriwayat[index]
+                                                            .status ==
+                                                        "butuh konfirmasi"
+                                                    ? Color(0xFFFF8C00)
+                                                        .withOpacity(0.7)
+                                                    : allriwayat[index]
+                                                                .status ==
+                                                            null
+                                                        ? Colors.red
+                                                            .withOpacity(0.7)
+                                                        : Colors.blue
+                                                            .withOpacity(0.7),
                                               ),
                                             ),
-                                          ],
+                                          ),
                                         ),
-                                      ),
+                                      ],
                                     ),
-                                    Flexible(
-                                      flex: 3,
-                                      child: SizedBox(
-                                        width: double.infinity,
-                                        child: Text(
-                                          "Menunggu Konfirmasi",
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(color: Colors.amber),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                )
+                    )
         ],
       ),
     );
@@ -656,6 +794,7 @@ class _PembayaranPageState extends State<PembayaranPage> {
   @override
   void dispose() {
     _controllerBayar.dispose();
+    _controllerRiwayat.dispose();
     super.dispose();
   }
 }
