@@ -31,6 +31,7 @@ Future<void> main() async {
 
 class MyApp extends StatelessWidget {
   static const domain = 'https://api-develop.ones-edu.com';
+  // static const domain = 'https://demo.ones-edu.com/getting';
   const MyApp({Key? key}) : super(key: key);
 
   @override

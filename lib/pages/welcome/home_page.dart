@@ -719,7 +719,7 @@ class _HomePageState extends State<HomePage> {
                                 Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
-                                  children: const [
+                                  children: [
                                     Text(
                                       "Total Tagihan",
                                       style: TextStyle(
@@ -727,12 +727,22 @@ class _HomePageState extends State<HomePage> {
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                    Text(
-                                      "lihat detail",
-                                      style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.bold,
-                                          color: Color(0xFFFFA726)),
+                                    GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          CupertinoPageRoute(
+                                              builder: (context) =>
+                                                  PembayaranPage()),
+                                        );
+                                      },
+                                      child: Text(
+                                        "lihat detail",
+                                        style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                            color: Color(0xFFFFA726)),
+                                      ),
                                     ),
                                   ],
                                 ),

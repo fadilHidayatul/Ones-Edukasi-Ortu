@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'package:edu_ready/pages/pembayaran/pembayaran_page.dart';
 import 'package:edu_ready/pages/welcome/home_page.dart';
 import 'package:edu_ready/providers/auth_provider.dart';
 import 'package:flutter/cupertino.dart';
@@ -171,10 +172,12 @@ class _LoginPageState extends State<LoginPage> {
                                             authProv
                                                 .loginUser(txtUsername.text,
                                                     txtPassword.text)
-                                                .then((value) => Navigator
-                                                    .pushReplacementNamed(
-                                                        context,
-                                                        HomePage.pageRoute))
+                                                .then(
+                                                  (value) => Navigator
+                                                      .pushReplacement(context, CupertinoPageRoute(builder: (context) {
+                                                        return HomePage();
+                                                      },))
+                                                )
                                                 .catchError((onerror) {
                                               ScaffoldMessenger.of(context)
                                                   .showSnackBar(SnackBar(
