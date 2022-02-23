@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'dart:convert';
+import 'dart:html';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:edu_ready/model/dashboard.dart';
@@ -385,8 +386,12 @@ class _HomePageState extends State<HomePage> {
                                   children: [
                                     IconButton(
                                         onPressed: () {
-                                          Navigator.pushNamed(
-                                              context, TopUpPage.pageRoute);
+                                          Navigator.push(
+                                            context,
+                                            CupertinoPageRoute(
+                                              builder: (context) => TopUpPage(),
+                                            ),
+                                          );
                                         },
                                         icon: Icon(
                                           CupertinoIcons.tray_arrow_down,
@@ -407,8 +412,13 @@ class _HomePageState extends State<HomePage> {
                                   children: [
                                     IconButton(
                                         onPressed: () {
-                                          Navigator.pushNamed(
-                                              context, HistorySaldo.pageRoute);
+                                          Navigator.push(
+                                            context,
+                                            CupertinoPageRoute(
+                                              builder: (context) =>
+                                                  HistorySaldo(),
+                                            ),
+                                          );
                                         },
                                         icon: Icon(
                                           // Icons.history_edu,
@@ -732,8 +742,9 @@ class _HomePageState extends State<HomePage> {
                                         Navigator.push(
                                           context,
                                           CupertinoPageRoute(
-                                              builder: (context) =>
-                                                  PembayaranPage()),
+                                            builder: (context) =>
+                                                PembayaranPage(),
+                                          ),
                                         );
                                       },
                                       child: Text(
@@ -837,8 +848,13 @@ class _HomePageState extends State<HomePage> {
 
                                     GestureDetector(
                                       onTap: () {
-                                        Navigator.pushNamed(
-                                            context, AkademikPage.pageRoute);
+                                        Navigator.push(
+                                          context,
+                                          CupertinoPageRoute(
+                                            builder: (context) =>
+                                                AkademikPage(),
+                                          ),
+                                        );
                                       },
                                       child: Text(
                                         "lihat detail",
@@ -1196,8 +1212,12 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                     GestureDetector(
                                       onTap: () {
-                                        Navigator.pushNamed(
-                                            context, AbsensiPage.pageRoute);
+                                        Navigator.push(
+                                          context,
+                                          CupertinoPageRoute(
+                                            builder: (context) => AbsensiPage(),
+                                          ),
+                                        );
                                       },
                                       child: Text(
                                         "lihat detail",
@@ -1326,14 +1346,27 @@ class _HomePageState extends State<HomePage> {
                                     Text(
                                       "Penilaian Khusus",
                                       style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold),
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                     GestureDetector(
                                       onTap: () {
                                         Navigator.pushNamed(
-                                            context, AkademikPage.pageRoute,
-                                            arguments: 1);
+                                          context,
+                                          AkademikPage.pageRoute,
+                                          arguments: 1,
+                                        );
+                                        Navigator.push(
+                                          context,
+                                          CupertinoPageRoute(
+                                            builder: (context) =>
+                                                AkademikPage(),
+                                            settings: RouteSettings(
+                                              arguments: 1,
+                                            ),
+                                          ),
+                                        );
                                       },
                                       child: Text(
                                         "lihat detail",
@@ -1529,8 +1562,14 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                     GestureDetector(
                                       onTap: () {
-                                        Navigator.pushNamed(
-                                            context, MateriPage.pageRoute);
+                                        // Navigator.pushNamed(
+                                        //     context, MateriPage.pageRoute);
+                                        Navigator.push(
+                                          context,
+                                          CupertinoPageRoute(
+                                            builder: (context) => MateriPage(),
+                                          ),
+                                        );
                                       },
                                       child: Text(
                                         "lihat detail",

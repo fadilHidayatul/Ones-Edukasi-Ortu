@@ -25,7 +25,7 @@ class _SplashScreenState extends State<SplashScreen> {
     if (authData) {
       Navigator.pushReplacement(
               context,
-              MaterialPageRoute(
+              CupertinoPageRoute(
                 builder: (context) {
                   return HomePage();
                 },
@@ -35,7 +35,7 @@ class _SplashScreenState extends State<SplashScreen> {
     }else{
       Navigator.pushReplacement(
               context,
-              MaterialPageRoute(
+              CupertinoPageRoute(
                 builder: (context) {
                   return LoginPage();
                 },
