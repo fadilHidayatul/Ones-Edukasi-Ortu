@@ -4,8 +4,10 @@ import 'package:dropdown_search/dropdown_search.dart';
 import 'package:edu_ready/model/absensi_harian.dart';
 import 'package:edu_ready/providers/absensi_provider.dart';
 import 'package:edu_ready/widgets/card_appbar_widget.dart';
+import 'package:edu_ready/widgets/no_internet_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -20,6 +22,7 @@ class AbsensiPage extends StatefulWidget {
 
 class _AbsensiPageState extends State<AbsensiPage> {
   bool firstinitharian = true;
+  bool isInternet = false;
   bool loading = false;
   bool isharian = true;
 
@@ -35,12 +38,36 @@ class _AbsensiPageState extends State<AbsensiPage> {
   void initState() {
     super.initState();
     initializeDateFormatting('id_ID');
+    _checkInternet();
   }
 
   @override
   void didChangeDependencies() {
-    if (firstinitharian) {
-      loading = true;
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
+        _getmorelist();
+      }
+    });
+
+    super.didChangeDependencies();
+  }
+
+  _checkInternet() {
+    InternetConnectionChecker().onStatusChange.listen((event) {
+      setState(() {
+        if (event == InternetConnectionStatus.connected) {
+          isInternet = true;
+          _getfirstlist();
+        } else if (event == InternetConnectionStatus.disconnected) {
+          isInternet = false;
+        }
+      });
+    });
+  }
+
+  _getfirstlist() {
+    loading = true;
       Provider.of<AbsensiProvider>(context, listen: false)
           .getabsensiharian()
           .then((value) {
@@ -48,14 +75,15 @@ class _AbsensiPageState extends State<AbsensiPage> {
             .listabsensiharian[page]
             .data!;
         countDay = dayList.length;
-        lastpage =
-            Provider.of<AbsensiProvider>(context, listen: false).lastpage;
+        lastpage = Provider.of<AbsensiProvider>(
+          context,
+          listen: false,
+        ).lastpage;
 
         setState(() {
           loading = false;
         });
       }).catchError((onError) {
-        print("Error harian $onError");
         setState(() {
           loading = false;
         });
@@ -70,23 +98,10 @@ class _AbsensiPageState extends State<AbsensiPage> {
           });
         };
       }).catchError((onError) {
-        print("Error bulanan $onError");
         setState(() {
           loading = false;
         });
       });
-
-      firstinitharian = false;
-    }
-
-    _scrollController.addListener(() {
-      if (_scrollController.position.pixels ==
-          _scrollController.position.maxScrollExtent) {
-        _getmorelist();
-      }
-    });
-
-    super.didChangeDependencies();
   }
 
   _getmorelist() {
@@ -110,7 +125,7 @@ class _AbsensiPageState extends State<AbsensiPage> {
         //setstate untuk notice tampilan kalo loadmore udh jalan
         setState(() {});
       }).catchError((onError) {
-        print(onError);
+        // print(onError);
       });
     }
   }
@@ -125,381 +140,297 @@ class _AbsensiPageState extends State<AbsensiPage> {
           child: CardAppBar(title: "Absensi Siswa"),
         ),
       ),
-      body: Container(
-        color: Colors.grey.shade200,
-        child: (loading)
-            ? Center(
-                child: CupertinoActivityIndicator(),
-              )
-            : Column(
-                children: [
-                  Expanded(
-                      child: SizedBox(
-                    width: double.infinity,
-                    child: Column(
+      body: !isInternet
+          ? NoInternetWidget()
+          : Container(
+              color: Colors.grey.shade100,
+              child: (loading)
+                  ? Center(
+                      child: CupertinoActivityIndicator(),
+                    )
+                  : Column(
                       children: [
-                        //card filter pilih harian / bulanan
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-                          child: DropdownSearch(
-                            mode: Mode.BOTTOM_SHEET,
-                            showSelectedItems: true,
-                            items: selected,
-                            selectedItem: selected[0],
-                            maxHeight: 160,
-                            dropdownSearchDecoration: InputDecoration(
-                                contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 10),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  borderSide: BorderSide(
-                                    color: Color(0xFFFF8C00),
-                                    width: 0.7,
+                        Expanded(
+                            child: SizedBox(
+                          width: double.infinity,
+                          child: Column(
+                            children: [
+                              //card filter pilih harian / bulanan
+                              Padding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                                child: DropdownSearch(
+                                  mode: Mode.BOTTOM_SHEET,
+                                  showSelectedItems: true,
+                                  items: selected,
+                                  selectedItem: selected[0],
+                                  maxHeight: 160,
+                                  dropdownSearchDecoration: InputDecoration(
+                                      contentPadding:
+                                          EdgeInsets.symmetric(horizontal: 10),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                        borderSide: BorderSide(
+                                          color: Color(0xFFFF8C00),
+                                          width: 0.7,
+                                        ),
+                                      ),
+                                      labelText: "Filter absensi",
+                                      labelStyle:
+                                          TextStyle(color: Colors.black),
+                                      filled: true,
+                                      fillColor: Colors.white),
+                                  popupTitle: Container(
+                                    width: double.infinity,
+                                    margin: EdgeInsets.only(top: 12),
+                                    child: Text(
+                                      "Pilih data absensi",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold),
+                                    ),
                                   ),
+                                  popupShape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.only(
+                                          topLeft: Radius.circular(10),
+                                          topRight: Radius.circular(10))),
+                                  onChanged: (value) {
+                                    if (value == "Bulanan") {
+                                      setState(() {
+                                        isharian = false;
+                                      });
+                                    } else if (value == "Harian") {
+                                      setState(() {
+                                        isharian = true;
+                                      });
+                                    }
+                                  },
                                 ),
-                                labelText: "Filter absensi",
-                                labelStyle: TextStyle(color: Colors.black),
-                                filled: true,
-                                fillColor: Colors.white),
-                            popupTitle: Container(
-                              width: double.infinity,
-                              margin: EdgeInsets.only(top: 12),
-                              child: Text(
-                                "Pilih data absensi",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold),
                               ),
-                            ),
-                            popupShape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(10),
-                                    topRight: Radius.circular(10))),
-                            onChanged: (value) {
-                              if (value == "Bulanan") {
-                                setState(() {
-                                  isharian = false;
-                                });
-                              } else if (value == "Harian") {
-                                setState(() {
-                                  isharian = true;
-                                });
-                              }
-                            },
-                          ),
-                        ),
 
-                        ////*****tampilan berdasarkan pilihan user */
-                        (isharian)
-                            ? Consumer<AbsensiProvider>(
-                                builder: (context, value, child) {
-                                  return Expanded(
-                                    ////*****cek list kosong atau tidak*/
-                                    child: (value.listabsensiharian[0].data!.isEmpty)
-                                        ? Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: [
-                                              Image.asset(
-                                                "assets/images/ic_nodata.png",
-                                                width: 300,
-                                                height: 300,
-                                              ),
-                                              Text(
-                                                "Tidak ada data Absensi Harian",
-                                                style: TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                            ],
-                                          )
-                                        : Column(
-                                            children: [
-                                              ////header tabel harian
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 15),
-                                                child: Row(children: const [
-                                                  Flexible(
-                                                      flex: 2,
-                                                      child: SizedBox(
-                                                        width: double.infinity,
-                                                        child: Text(
-                                                          "Tanggal",
-                                                          style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w600),
-                                                        ),
-                                                      )),
-                                                  Flexible(
-                                                      flex: 3,
-                                                      child: SizedBox(
-                                                        width: double.infinity,
-                                                        child: Text(
-                                                          " Mata Pelajaran",
-                                                          style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w600),
-                                                        ),
-                                                      )),
-                                                  Flexible(
-                                                      flex: 2,
-                                                      child: SizedBox(
-                                                        width: double.infinity,
-                                                        child: Text(
-                                                          "Kehadiran",
-                                                          textAlign:
-                                                              TextAlign.center,
-                                                          style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w600),
-                                                        ),
-                                                      )),
-                                                ]),
-                                              ),
-                                              ////listview builder harian
-                                              Expanded(
-                                                  child: SizedBox(
-                                                width: double.infinity,
-                                                child: ListView.builder(
-                                                  controller: _scrollController,
-                                                  itemCount: dayList.length,
-                                                  itemBuilder:
-                                                      (context, index) {
-                                                    return Padding(
+                              ////*****tampilan berdasarkan pilihan user */
+                              (isharian)
+                                  ? Consumer<AbsensiProvider>(
+                                      builder: (context, value, child) {
+                                        return Expanded(
+                                          ////*****cek list kosong atau tidak*/
+                                          child: (value.listabsensiharian[0]
+                                                  .data!.isEmpty)
+                                              ? Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  children: [
+                                                    Image.asset(
+                                                      "assets/images/ic_nodata.png",
+                                                      width: 300,
+                                                      height: 300,
+                                                    ),
+                                                    Text(
+                                                      "Tidak ada data Absensi Harian",
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                  ],
+                                                )
+                                              : Column(
+                                                  children: [
+                                                    ////header tabel harian
+                                                    Padding(
                                                       padding: const EdgeInsets
                                                               .symmetric(
-                                                          vertical: 2,
-                                                          horizontal: 6),
-                                                      child: Card(
-                                                        elevation: 2,
-                                                        color: Colors.white,
-                                                        shape: RoundedRectangleBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        10)),
-                                                        child: Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                      .symmetric(
-                                                                  vertical: 15,
-                                                                  horizontal:
-                                                                      10),
-                                                          child: Row(
-                                                            children: [
-                                                              Flexible(
-                                                                  flex: 2,
-                                                                  child:
-                                                                      Container(
-                                                                    width: double
-                                                                        .infinity,
-                                                                    margin: EdgeInsets
-                                                                        .symmetric(
-                                                                            horizontal:
-                                                                                3),
-                                                                    child: Text(DateFormat(
-                                                                            "d MMMM yyyy",
-                                                                            "id_ID")
-                                                                        .format(
-                                                                            dayList[index].tanggal)),
-                                                                  )),
-                                                              Flexible(
-                                                                  flex: 3,
-                                                                  child:
-                                                                      Container(
-                                                                    width: double
-                                                                        .infinity,
-                                                                    margin: EdgeInsets
-                                                                        .symmetric(
-                                                                            horizontal:
-                                                                                3),
-                                                                    child: Text(
-                                                                        dayList[index]
-                                                                            .namapel),
-                                                                  )),
-                                                              Flexible(
-                                                                  flex: 2,
-                                                                  child:
-                                                                      Container(
-                                                                    width: double
-                                                                        .infinity,
-                                                                    margin: EdgeInsets
-                                                                        .symmetric(
-                                                                            horizontal:
-                                                                                3),
-                                                                    child: Text(
-                                                                      "${dayList[index].ket}",
-                                                                      textAlign:
-                                                                          TextAlign
-                                                                              .center,
-                                                                      style:
-                                                                          TextStyle(
+                                                          horizontal: 15),
+                                                      child: Row(
+                                                          children: const [
+                                                            Flexible(
+                                                                flex: 2,
+                                                                child: SizedBox(
+                                                                  width: double
+                                                                      .infinity,
+                                                                  child: Text(
+                                                                    "Tanggal",
+                                                                    style: TextStyle(
                                                                         fontWeight:
-                                                                            FontWeight.bold,
-                                                                        color: (dayList[index].ket ==
-                                                                                "Hadir")
-                                                                            ? Color(0xFF0066FF)
-                                                                            : (dayList[index].ket == "Tidak Hadir")
-                                                                                ? Color(0xFFEF5350)
-                                                                                : (dayList[index].ket == "Izin")
-                                                                                    ? Color(0xFFFFB800)
-                                                                                    : Color(0xFFFFFFFF),
-                                                                      ),
-                                                                    ),
-                                                                  )),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    );
-                                                  },
-                                                ),
-                                              ))
-                                            ],
-                                          ),
-                                  );
-                                },
-                              )
-                            : Consumer<AbsensiProvider>(
-                                builder: (context, value, child) {
-                                  ///**** mengambil data bulan ke krna response di model bentuk map****/
-                                  List<String> bulanKe = [];
-                                  var data;
-                                  if (value.listabsensibulanan.isNotEmpty) {
-                                    value.listabsensibulanan[0].data!.entries
-                                        .map((e) {
-                                      bulanKe.add(e.key);
-                                    }).toList();
-                                    data = value.listabsensibulanan[0].data;
-                                  }
-
-                                  return Expanded(
-                                      child: (value.listabsensibulanan.isEmpty)
-                                          ? Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              children: [
-                                                Image.asset(
-                                                  "assets/images/ic_nodata.png",
-                                                  width: 300,
-                                                  height: 300,
-                                                ),
-                                                Text(
-                                                  "Tidak ada data Absensi Bulanan",
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                              ],
-                                            )
-                                          : Column(
-                                              children: [
-                                                ////header tabel bulanan
-                                                Padding(
-                                                  padding: const EdgeInsets
-                                                          .symmetric(
-                                                      horizontal: 26),
-                                                  child: Row(
-                                                    children: const [
-                                                      Flexible(
-                                                          flex: 3,
-                                                          child: SizedBox(
-                                                            width:
-                                                                double.infinity,
-                                                            child: Text(
-                                                              "Bulan",
-                                                              style: TextStyle(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w600),
-                                                            ),
-                                                          )),
-                                                      Flexible(
-                                                          flex: 1,
-                                                          child: SizedBox(
-                                                            width:
-                                                                double.infinity,
-                                                            child: Text(
-                                                              "Hadir",
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .center,
-                                                              style: TextStyle(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w600),
-                                                            ),
-                                                          )),
-                                                      Flexible(
-                                                          flex: 1,
-                                                          child: SizedBox(
-                                                            width:
-                                                                double.infinity,
-                                                            child: Text(
-                                                              "Izin",
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .center,
-                                                              style: TextStyle(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w600),
-                                                            ),
-                                                          )),
-                                                      Flexible(
-                                                          flex: 1,
-                                                          child: SizedBox(
-                                                            width:
-                                                                double.infinity,
-                                                            child: Text(
-                                                              "Absen",
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .center,
-                                                              style: TextStyle(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w600),
-                                                            ),
-                                                          )),
-                                                    ],
-                                                  ),
-                                                ),
-                                                ////listview builder bulanan
-                                                Expanded(
-                                                  child: ListView.builder(
-                                                    itemCount: data!.length,
-                                                    itemBuilder:
-                                                        (context, index) {
-                                                      return Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                    .symmetric(
-                                                                horizontal: 8,
-                                                                vertical: 4),
-                                                        child: Card(
-                                                          elevation: 2,
-                                                          color: Colors.white,
-                                                          shape: RoundedRectangleBorder(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          10)),
-                                                          child: Padding(
+                                                                            FontWeight.w600),
+                                                                  ),
+                                                                )),
+                                                            Flexible(
+                                                                flex: 3,
+                                                                child: SizedBox(
+                                                                  width: double
+                                                                      .infinity,
+                                                                  child: Text(
+                                                                    " Mata Pelajaran",
+                                                                    style: TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight.w600),
+                                                                  ),
+                                                                )),
+                                                            Flexible(
+                                                                flex: 2,
+                                                                child: SizedBox(
+                                                                  width: double
+                                                                      .infinity,
+                                                                  child: Text(
+                                                                    "Kehadiran",
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .center,
+                                                                    style: TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight.w600),
+                                                                  ),
+                                                                )),
+                                                          ]),
+                                                    ),
+                                                    ////listview builder harian
+                                                    Expanded(
+                                                        child: SizedBox(
+                                                      width: double.infinity,
+                                                      child: ListView.builder(
+                                                        controller:
+                                                            _scrollController,
+                                                        itemCount:
+                                                            dayList.length,
+                                                        itemBuilder:
+                                                            (context, index) {
+                                                          return Padding(
                                                             padding:
                                                                 const EdgeInsets
+                                                                        .symmetric(
+                                                                    vertical: 2,
+                                                                    horizontal:
+                                                                        6),
+                                                            child: Card(
+                                                              elevation: 2,
+                                                              color:
+                                                                  Colors.white,
+                                                              shape: RoundedRectangleBorder(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              10)),
+                                                              child: Padding(
+                                                                padding: const EdgeInsets
                                                                         .symmetric(
                                                                     vertical:
                                                                         15,
                                                                     horizontal:
-                                                                        15),
+                                                                        10),
+                                                                child: Row(
+                                                                  children: [
+                                                                    Flexible(
+                                                                        flex: 2,
+                                                                        child:
+                                                                            Container(
+                                                                          width:
+                                                                              double.infinity,
+                                                                          margin:
+                                                                              EdgeInsets.symmetric(horizontal: 3),
+                                                                          child:
+                                                                              Text(DateFormat("d MMMM yyyy", "id_ID").format(dayList[index].tanggal)),
+                                                                        )),
+                                                                    Flexible(
+                                                                        flex: 3,
+                                                                        child:
+                                                                            Container(
+                                                                          width:
+                                                                              double.infinity,
+                                                                          margin:
+                                                                              EdgeInsets.symmetric(horizontal: 3),
+                                                                          child:
+                                                                              Text(dayList[index].namapel),
+                                                                        )),
+                                                                    Flexible(
+                                                                        flex: 2,
+                                                                        child:
+                                                                            Container(
+                                                                          width:
+                                                                              double.infinity,
+                                                                          margin:
+                                                                              EdgeInsets.symmetric(horizontal: 3),
+                                                                          child:
+                                                                              Text(
+                                                                            "${dayList[index].ket}",
+                                                                            textAlign:
+                                                                                TextAlign.center,
+                                                                            style:
+                                                                                TextStyle(
+                                                                              fontWeight: FontWeight.bold,
+                                                                              color: (dayList[index].ket == "Hadir")
+                                                                                  ? Color(0xFF0066FF)
+                                                                                  : (dayList[index].ket == "Tidak Hadir")
+                                                                                      ? Color(0xFFEF5350)
+                                                                                      : (dayList[index].ket == "Izin")
+                                                                                          ? Color(0xFFFFB800)
+                                                                                          : Color(0xFFFFFFFF),
+                                                                            ),
+                                                                          ),
+                                                                        )),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          );
+                                                        },
+                                                      ),
+                                                    ))
+                                                  ],
+                                                ),
+                                        );
+                                      },
+                                    )
+                                  : Consumer<AbsensiProvider>(
+                                      builder: (context, value, child) {
+                                        ///**** mengambil data bulan ke krna response di model bentuk map****/
+                                        List<String> bulanKe = [];
+                                        var data;
+                                        if (value
+                                            .listabsensibulanan.isNotEmpty) {
+                                          value.listabsensibulanan[0].data!
+                                              .entries
+                                              .map((e) {
+                                            bulanKe.add(e.key);
+                                          }).toList();
+                                          data =
+                                              value.listabsensibulanan[0].data;
+                                        }
+
+                                        return Expanded(
+                                            child:
+                                                (value.listabsensibulanan
+                                                        .isEmpty)
+                                                    ? Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Image.asset(
+                                                            "assets/images/ic_nodata.png",
+                                                            width: 300,
+                                                            height: 300,
+                                                          ),
+                                                          Text(
+                                                            "Tidak ada data Absensi Bulanan",
+                                                            style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                          ),
+                                                        ],
+                                                      )
+                                                    : Column(
+                                                        children: [
+                                                          ////header tabel bulanan
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                        .symmetric(
+                                                                    horizontal:
+                                                                        26),
                                                             child: Row(
-                                                              children: [
+                                                              children: const [
                                                                 Flexible(
                                                                     flex: 3,
                                                                     child:
@@ -508,14 +439,10 @@ class _AbsensiPageState extends State<AbsensiPage> {
                                                                           .infinity,
                                                                       child:
                                                                           Text(
-                                                                        DateFormat("MMMM",
-                                                                                "ID_id")
-                                                                            .format(
-                                                                          DateTime(
-                                                                              0,
-                                                                              data[bulanKe[index]]!.bulan ?? 0),
-                                                                        ),
-                                                                        // "${ bulan}",
+                                                                        "Bulan",
+                                                                        style: TextStyle(
+                                                                            fontWeight:
+                                                                                FontWeight.w600),
                                                                       ),
                                                                     )),
                                                                 Flexible(
@@ -526,12 +453,12 @@ class _AbsensiPageState extends State<AbsensiPage> {
                                                                           .infinity,
                                                                       child:
                                                                           Text(
-                                                                        "${data[bulanKe[index]]!.hadir}",
+                                                                        "Hadir",
                                                                         textAlign:
                                                                             TextAlign.center,
                                                                         style: TextStyle(
-                                                                            color:
-                                                                                Color(0xFF0066FF)),
+                                                                            fontWeight:
+                                                                                FontWeight.w600),
                                                                       ),
                                                                     )),
                                                                 Flexible(
@@ -542,12 +469,12 @@ class _AbsensiPageState extends State<AbsensiPage> {
                                                                           .infinity,
                                                                       child:
                                                                           Text(
-                                                                        "${data[bulanKe[index]]!.izin}",
+                                                                        "Izin",
                                                                         textAlign:
                                                                             TextAlign.center,
                                                                         style: TextStyle(
-                                                                            color:
-                                                                                Color(0xFFFFB800)),
+                                                                            fontWeight:
+                                                                                FontWeight.w600),
                                                                       ),
                                                                     )),
                                                                 Flexible(
@@ -558,32 +485,111 @@ class _AbsensiPageState extends State<AbsensiPage> {
                                                                           .infinity,
                                                                       child:
                                                                           Text(
-                                                                        "${data[bulanKe[index]]!.cabut}",
+                                                                        "Absen",
                                                                         textAlign:
                                                                             TextAlign.center,
                                                                         style: TextStyle(
-                                                                            color:
-                                                                                Color(0xFFEF5350)),
+                                                                            fontWeight:
+                                                                                FontWeight.w600),
                                                                       ),
                                                                     )),
                                                               ],
                                                             ),
                                                           ),
-                                                        ),
-                                                      );
-                                                    },
-                                                  ),
-                                                )
-                                              ],
-                                            ));
-                                },
-                              )
+                                                          ////listview builder bulanan
+                                                          Expanded(
+                                                            child: ListView
+                                                                .builder(
+                                                              itemCount:
+                                                                  data!.length,
+                                                              itemBuilder:
+                                                                  (context,
+                                                                      index) {
+                                                                return Padding(
+                                                                  padding: const EdgeInsets
+                                                                          .symmetric(
+                                                                      horizontal:
+                                                                          8,
+                                                                      vertical:
+                                                                          4),
+                                                                  child: Card(
+                                                                    elevation:
+                                                                        2,
+                                                                    color: Colors
+                                                                        .white,
+                                                                    shape: RoundedRectangleBorder(
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(10)),
+                                                                    child:
+                                                                        Padding(
+                                                                      padding: const EdgeInsets
+                                                                              .symmetric(
+                                                                          vertical:
+                                                                              15,
+                                                                          horizontal:
+                                                                              15),
+                                                                      child:
+                                                                          Row(
+                                                                        children: [
+                                                                          Flexible(
+                                                                              flex: 3,
+                                                                              child: SizedBox(
+                                                                                width: double.infinity,
+                                                                                child: Text(
+                                                                                  DateFormat("MMMM", "ID_id").format(
+                                                                                    DateTime(0, data[bulanKe[index]]!.bulan ?? 0),
+                                                                                  ),
+                                                                                  // "${ bulan}",
+                                                                                ),
+                                                                              )),
+                                                                          Flexible(
+                                                                              flex: 1,
+                                                                              child: SizedBox(
+                                                                                width: double.infinity,
+                                                                                child: Text(
+                                                                                  "${data[bulanKe[index]]!.hadir}",
+                                                                                  textAlign: TextAlign.center,
+                                                                                  style: TextStyle(color: Color(0xFF0066FF)),
+                                                                                ),
+                                                                              )),
+                                                                          Flexible(
+                                                                              flex: 1,
+                                                                              child: SizedBox(
+                                                                                width: double.infinity,
+                                                                                child: Text(
+                                                                                  "${data[bulanKe[index]]!.izin}",
+                                                                                  textAlign: TextAlign.center,
+                                                                                  style: TextStyle(color: Color(0xFFFFB800)),
+                                                                                ),
+                                                                              )),
+                                                                          Flexible(
+                                                                              flex: 1,
+                                                                              child: SizedBox(
+                                                                                width: double.infinity,
+                                                                                child: Text(
+                                                                                  "${data[bulanKe[index]]!.cabut}",
+                                                                                  textAlign: TextAlign.center,
+                                                                                  style: TextStyle(color: Color(0xFFEF5350)),
+                                                                                ),
+                                                                              )),
+                                                                        ],
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                );
+                                                              },
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ));
+                                      },
+                                    )
+                            ],
+                          ),
+                        ))
                       ],
                     ),
-                  ))
-                ],
-              ),
-      ),
+            ),
     );
   }
 }

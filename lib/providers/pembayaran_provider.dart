@@ -51,7 +51,8 @@ class PembayaranProvider with ChangeNotifier {
         notifyListeners();
       } else {
         print("Error ${response.statusCode}");
-        throw ("Error ${response.statusCode}");
+        // throw (json.decode(response.body)["message"]);
+        throw (response.statusCode);
       }
     } catch (e) {
       rethrow;
@@ -78,8 +79,7 @@ class PembayaranProvider with ChangeNotifier {
     }
   }
 
-  Future<void> sendRingkasanPembayaran(
-      List<Map<String, dynamic>> arrayItem) async {
+  Future<void> sendRingkasanPembayaran( List<Map<String, dynamic>> arrayItem) async {
     Map<String, String> headers = {
       "Authorization": "Bearer $token",
       "Content-Type": "application/json",
@@ -126,7 +126,7 @@ class PembayaranProvider with ChangeNotifier {
         notifyListeners();
       } else {
         // print("${json.decode(response.body)["message"]}");
-        throw (json.decode(response.body)["message"]);
+        throw(response.statusCode);
       }
     } catch (e) {
       rethrow;
@@ -178,8 +178,7 @@ class PembayaranProvider with ChangeNotifier {
     }
   }
 
-  Future<void> sendRiwayatBuktiPembayaran(
-      File buktiBayarRiwayat, String nokwitansi) async {
+  Future<void> sendRiwayatBuktiPembayaran(File buktiBayarRiwayat, String nokwitansi) async {
     Map<String, String> headers = {"Authorization": "Bearer $token"};
     Uri url = Uri.parse(urlPostBukti);
 

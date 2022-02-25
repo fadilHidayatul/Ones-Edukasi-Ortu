@@ -9,6 +9,7 @@ import 'package:edu_ready/widgets/card_select_money.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 
 class TopUpPage extends StatefulWidget {
   const TopUpPage({Key? key}) : super(key: key);
@@ -21,10 +22,30 @@ class TopUpPage extends StatefulWidget {
 class _TopUpPageState extends State<TopUpPage> {
   final ScrollController _controller = ScrollController();
   final ScrollController _dummycon1 = ScrollController();
-  int nominal = 0;
   final TextEditingController _nominalctr = TextEditingController();
+  int nominal = 0;
+
+  bool isInternet = false;
 
   File? pickedImage;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkInternet();
+  }
+
+  _checkInternet() {
+    InternetConnectionChecker().onStatusChange.listen((event) {
+      setState(() {
+        if (event == InternetConnectionStatus.connected) {
+          isInternet = true;
+        } else if (event == InternetConnectionStatus.disconnected) {
+          isInternet = false;
+        }
+      });
+    });
+  }
 
   _getfromgallery() async {
     pickedImage = null;
@@ -125,7 +146,7 @@ class _TopUpPageState extends State<TopUpPage> {
                               } else {
                                 nominal = 0;
                               }
-                              print(nominal);
+                              // print(nominal);
                             });
                           },
                         ),
@@ -394,6 +415,17 @@ class _TopUpPageState extends State<TopUpPage> {
                                     ),
                                   ),
                                 );
+                              } else if (!isInternet) {
+                                showCupertinoDialog(
+                                  barrierDismissible: true,
+                                  context: context,
+                                  builder: (context) => CupertinoAlertDialog(
+                                    title: Text("Error"),
+                                    content: Text(
+                                      "Cek koneksi internet sebelum melanjutkan Top Up",
+                                    ),
+                                  ),
+                                );
                               } else {
                                 var sizemb =
                                     pickedImage!.lengthSync() / (1024 * 1024);
@@ -441,6 +473,7 @@ class _TopUpPageState extends State<TopUpPage> {
   void dispose() {
     _nominalctr.dispose();
     _controller.dispose();
+    _dummycon1.dispose();
     super.dispose();
   }
 }
