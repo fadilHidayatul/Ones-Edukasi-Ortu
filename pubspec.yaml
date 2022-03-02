@@ -79,7 +79,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/images/splash.png
+    - assets/images/one_text.png
     - assets/images/ic_akademik.png
     - assets/images/ic_pembayaran.png
     - assets/images/ic_absensi.png
@@ -90,6 +90,7 @@ flutter:
     - assets/images/akademik.png
     - assets/lottie/ic_disconnect.json
     - assets/lottie/ic_no_data.json
+    - assets/lottie/ic_splash.json
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 

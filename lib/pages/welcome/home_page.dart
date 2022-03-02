@@ -199,7 +199,7 @@ class _HomePageState extends State<HomePage> {
                           },
                         );
                       },
-                      icon: Image.asset("assets/images/splash.png"))
+                      icon: Image.asset("assets/images/one_text.png"))
                 ],
               ),
             ),
