@@ -4,6 +4,7 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:edu_ready/model/mapel.dart';
 import 'package:edu_ready/providers/materi_provider.dart';
+import 'package:edu_ready/utils/internet_checker.dart';
 import 'package:edu_ready/widgets/batas_materi_popup.dart';
 import 'package:edu_ready/widgets/card_appbar_widget.dart';
 import 'package:edu_ready/widgets/no_data_widget.dart';
@@ -24,12 +25,11 @@ class MateriPage extends StatefulWidget {
 }
 
 class _MateriPageState extends State<MateriPage> {
-  bool firstinitmapel = true;
-  bool loading = false;
-  bool isInternet = false;
+  bool firstinit = true;
+  bool loading = true;
+  bool isInternet = true;
 
   List<String> mapel = [""];
-  int page = 0;
   int lastPage = 0;
   String pilihanMatpel = "";
 
@@ -43,11 +43,20 @@ class _MateriPageState extends State<MateriPage> {
   }
 
   checkInternet() {
+    InternetConnectionChecker().hasConnection.then((value) {
+      if (!mounted) return;
+      setState(() {
+        isInternet = value;
+        if (value == true) getallfirstmapel();
+      });
+    });
+
     InternetConnectionChecker().onStatusChange.listen((event) {
+      if (!mounted) return;
       setState(() {
         if (event == InternetConnectionStatus.connected) {
           isInternet = true;
-          getfirstmapel();
+          getallfirstmapel();
         } else if (event == InternetConnectionStatus.disconnected) {
           isInternet = false;
         }
@@ -55,23 +64,20 @@ class _MateriPageState extends State<MateriPage> {
     });
   }
 
-  getfirstmapel() {
+  getallfirstmapel() async {
+    var prov = Provider.of<MateriProvider>(context, listen: false);
     loading = true;
     mapel.clear();
     batasmateri.clear();
 
     ////***ambil data mapel di page 1 */
-    Provider.of<MateriProvider>(context, listen: false)
-        .getfirstmapel()
-        .then((value) {
-      var getmp =
-          Provider.of<MateriProvider>(context, listen: false).listmapel[page];
-      lastPage = Provider.of<MateriProvider>(context, listen: false).lastPageMP;
+    prov.getfirstmapel().then((value) {
+      var getmp = prov.listmapel[0];
+
+      if (!mounted) return;
       setState(() {
-        pilihanMatpel = Provider.of<MateriProvider>(context, listen: false)
-            .listmapel[page]
-            .data![page]
-            .namapel!;
+        pilihanMatpel = prov.listmapel[0].data![0].namapel!;
+        lastPage = prov.lastPageMP;
       });
 
       /////***cek data duplicate di page 1 , add ke list mapel*/
@@ -94,27 +100,32 @@ class _MateriPageState extends State<MateriPage> {
 
       /////***ambil mata pelajaran lain jika page > 1 */
       if (lastPage > 1) {
-        getmoremapel(lastPage);
+        getmorematapelajaran();
 
+        if (!mounted) return;
         setState(() {
           loading = false;
         });
       }
     }).catchError((onError) {
+      if (!mounted) return;
       setState(() {
         loading = false;
       });
     });
   }
 
-  getmoremapel(lastPage) {
+  getmorematapelajaran() {
     //mengambil api page berdasarkan i
     //mengambil data model berdasarkan page
-
+    //ganti for dengan if cek page < lastpage
+    int page = 0;
     var prov = Provider.of<MateriProvider>(context, listen: false);
+
     for (var i = 2; i <= lastPage; i++) {
       prov.getmoremapel(i).then((value) {
         page++;
+
         // print("add data page ke $i");
         // print("array model $page");
 
@@ -134,9 +145,10 @@ class _MateriPageState extends State<MateriPage> {
           }
         }
 
+        if (!mounted) return;
         setState(() {});
       }).catchError((onError) {
-        print("error getmore mapel : $onError ");
+        // print("error getmore mapel : $onError ");
       });
     }
   }
@@ -195,6 +207,7 @@ class _MateriPageState extends State<MateriPage> {
                                         (mapel.isEmpty) ? "" : mapel[0],
                                     showSelectedItems: true,
                                     onChanged: (value) {
+                                      if (!mounted) return;
                                       setState(() {
                                         pilihanMatpel = value.toString();
                                         addbatasmateritolist(value.toString());
@@ -309,5 +322,10 @@ class _MateriPageState extends State<MateriPage> {
               ],
             ),
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 }

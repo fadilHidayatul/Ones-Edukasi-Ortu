@@ -4,6 +4,7 @@ import 'package:dropdown_search/dropdown_search.dart';
 import 'package:edu_ready/model/absensi_harian.dart';
 import 'package:edu_ready/providers/absensi_provider.dart';
 import 'package:edu_ready/widgets/card_appbar_widget.dart';
+import 'package:edu_ready/widgets/no_data_widget.dart';
 import 'package:edu_ready/widgets/no_internet_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -21,9 +22,8 @@ class AbsensiPage extends StatefulWidget {
 }
 
 class _AbsensiPageState extends State<AbsensiPage> {
-  bool firstinitharian = true;
-  bool isInternet = false;
-  bool loading = false;
+  bool isInternet = true;
+  bool loading = true;
   bool isharian = true;
 
   List<String> selected = ["Harian", "Bulanan"];
@@ -54,7 +54,15 @@ class _AbsensiPageState extends State<AbsensiPage> {
   }
 
   _checkInternet() {
+    InternetConnectionChecker().hasConnection.then((value) {
+      if (!mounted) return;
+      setState(() {
+        isInternet = value;
+        if (value == true) _getfirstlist();
+      });
+    });
     InternetConnectionChecker().onStatusChange.listen((event) {
+      if (!mounted) return;
       setState(() {
         if (event == InternetConnectionStatus.connected) {
           isInternet = true;
@@ -68,40 +76,43 @@ class _AbsensiPageState extends State<AbsensiPage> {
 
   _getfirstlist() {
     loading = true;
-      Provider.of<AbsensiProvider>(context, listen: false)
-          .getabsensiharian()
-          .then((value) {
-        dayList = Provider.of<AbsensiProvider>(context, listen: false)
-            .listabsensiharian[page]
-            .data!;
-        countDay = dayList.length;
-        lastpage = Provider.of<AbsensiProvider>(
-          context,
-          listen: false,
-        ).lastpage;
+    dayList.clear();
 
-        setState(() {
-          loading = false;
-        });
-      }).catchError((onError) {
-        setState(() {
-          loading = false;
-        });
-      });
+    Provider.of<AbsensiProvider>(context, listen: false)
+        .getabsensiharian()
+        .then((value) {
+      dayList = Provider.of<AbsensiProvider>(context, listen: false)
+          .listabsensiharian[page]
+          .data!;
+      countDay = dayList.length;
+      lastpage = Provider.of<AbsensiProvider>(context, listen: false).lastpage;
 
-      Provider.of<AbsensiProvider>(context, listen: false)
-          .getabsensibulanan()
-          .then((value) {
-        () {
-          setState(() {
-            loading = false;
-          });
-        };
-      }).catchError((onError) {
+      if (!mounted) return;
+      setState(() {
+        loading = false;
+      });
+    }).catchError((onError) {
+      if (!mounted) return;
+      setState(() {
+        loading = false;
+      });
+    });
+
+    Provider.of<AbsensiProvider>(context, listen: false)
+        .getabsensibulanan()
+        .then((value) {
+      () {
+        if (!mounted) return;
         setState(() {
           loading = false;
         });
+      };
+    }).catchError((onError) {
+      if (mounted) return;
+      setState(() {
+        loading = false;
       });
+    });
   }
 
   _getmorelist() {
@@ -123,6 +134,7 @@ class _AbsensiPageState extends State<AbsensiPage> {
         page++;
 
         //setstate untuk notice tampilan kalo loadmore udh jalan
+        if (!mounted) return;
         setState(() {});
       }).catchError((onError) {
         // print(onError);
@@ -217,22 +229,9 @@ class _AbsensiPageState extends State<AbsensiPage> {
                                           ////*****cek list kosong atau tidak*/
                                           child: (value.listabsensiharian[0]
                                                   .data!.isEmpty)
-                                              ? Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
-                                                  children: [
-                                                    Image.asset(
-                                                      "assets/images/ic_nodata.png",
-                                                      width: 300,
-                                                      height: 300,
-                                                    ),
-                                                    Text(
+                                              ? NoDataWidget(
+                                                  message:
                                                       "Tidak ada data Absensi Harian",
-                                                      style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                    ),
-                                                  ],
                                                 )
                                               : Column(
                                                   children: [
@@ -306,18 +305,20 @@ class _AbsensiPageState extends State<AbsensiPage> {
                                                               elevation: 2,
                                                               color:
                                                                   Colors.white,
-                                                              shape: RoundedRectangleBorder(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              10)),
+                                                              shape:
+                                                                  RoundedRectangleBorder(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            10),
+                                                              ),
                                                               child: Padding(
-                                                                padding: const EdgeInsets
-                                                                        .symmetric(
-                                                                    vertical:
-                                                                        15,
-                                                                    horizontal:
-                                                                        10),
+                                                                padding: EdgeInsets
+                                                                    .symmetric(
+                                                                        vertical:
+                                                                            15,
+                                                                        horizontal:
+                                                                            10),
                                                                 child: Row(
                                                                   children: [
                                                                     Flexible(
@@ -396,29 +397,14 @@ class _AbsensiPageState extends State<AbsensiPage> {
                                           data =
                                               value.listabsensibulanan[0].data;
                                         }
-
+                                                                 
                                         return Expanded(
                                             child:
                                                 (value.listabsensibulanan
                                                         .isEmpty)
-                                                    ? Column(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Image.asset(
-                                                            "assets/images/ic_nodata.png",
-                                                            width: 300,
-                                                            height: 300,
-                                                          ),
-                                                          Text(
+                                                    ? NoDataWidget(
+                                                        message:
                                                             "Tidak ada data Absensi Bulanan",
-                                                            style: TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold),
-                                                          ),
-                                                        ],
                                                       )
                                                     : Column(
                                                         children: [

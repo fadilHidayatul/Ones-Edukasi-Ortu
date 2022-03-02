@@ -24,9 +24,8 @@ class HistorySaldo extends StatefulWidget {
 }
 
 class _HistorySaldoState extends State<HistorySaldo> {
-  bool firstinit = true;
-  bool loadingfirst = false;
-  bool isInternet = false;
+  bool loadingfirst = true;
+  bool isInternet = true;
 
   final ScrollController _scrollController = ScrollController();
   late List<Datum> dummy = [];
@@ -44,7 +43,6 @@ class _HistorySaldoState extends State<HistorySaldo> {
 
   @override
   void didChangeDependencies() {
-    // dummy = List.generate(10, (index) => "item : ${index + 1}");
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
           _scrollController.position.maxScrollExtent) {
@@ -56,7 +54,15 @@ class _HistorySaldoState extends State<HistorySaldo> {
   }
 
   _checkinternet() {
+    InternetConnectionChecker().hasConnection.then((value) {
+      if (!mounted) return;
+      setState(() {
+        isInternet = value;
+        if(value == true) _getFirstList();
+      });
+    });
     InternetConnectionChecker().onStatusChange.listen((event) {
+      if (!mounted) return;
       setState(() {
         if (event == InternetConnectionStatus.connected) {
           isInternet = true;
@@ -70,25 +76,25 @@ class _HistorySaldoState extends State<HistorySaldo> {
 
   _getFirstList() {
     loadingfirst = true;
-      Provider.of<HistorySaldoProvider>(context, listen: false)
-          .getDataHistoryTopup()
-          .then((value) {
-        //generate data page 1 ke list ini
-        dummy = Provider.of<HistorySaldoProvider>(context, listen: false)
-            .listHistory[page]
-            .data!;
-        currentmax = dummy.length;
-        lastpage =
-            Provider.of<HistorySaldoProvider>(context, listen: false).lastpage;
-        setState(() {
-          loadingfirst = false;
-        });
-      }).catchError((onError) {
-        // print("first init gagal $onError");
-        setState(() {
-          loadingfirst = false;
-        });
+    Provider.of<HistorySaldoProvider>(context, listen: false)
+        .getDataHistoryTopup()
+        .then((value) {
+      //generate data page 1 ke list ini
+      dummy = Provider.of<HistorySaldoProvider>(context, listen: false)
+          .listHistory[page]
+          .data!;
+      currentmax = dummy.length;
+      lastpage =
+          Provider.of<HistorySaldoProvider>(context, listen: false).lastpage;
+      setState(() {
+        loadingfirst = false;
       });
+    }).catchError((onError) {
+      // print("first init gagal $onError");
+      setState(() {
+        loadingfirst = false;
+      });
+    });
   }
 
   _getMoreList() {

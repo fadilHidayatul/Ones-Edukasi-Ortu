@@ -5,6 +5,7 @@ import 'package:edu_ready/model/akademik_khusus.dart';
 import 'package:edu_ready/model/akademik_umum.dart';
 import 'package:edu_ready/providers/akademik_provider.dart';
 import 'package:edu_ready/widgets/card_appbar_widget.dart';
+import 'package:edu_ready/widgets/no_data_widget.dart';
 import 'package:edu_ready/widgets/no_internet_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -22,15 +23,12 @@ class AkademikPage extends StatefulWidget {
 }
 
 class _AkademikPageState extends State<AkademikPage> {
-  bool firstinit = true;
-  bool isloading = false;
-  bool isInternet = false;
+  bool isloading = true;
+  bool isInternet = true;
 
   int groupvalue = 0;
   int lastpage = 0;
-  int page = 0;
   int lastpagekhusus = 0;
-  int pagekhusus = 0;
 
   List<String> thn = ["2021/2022"];
   List<String> nilai = ["SEMUA", "ULANGAN HARIAN", "MID", "UAS"];
@@ -64,7 +62,16 @@ class _AkademikPageState extends State<AkademikPage> {
   }
 
   checkInternet() {
+    InternetConnectionChecker().hasConnection.then((value) {
+      if (!mounted) return;
+      setState(() {
+        isInternet = value;
+        if (value == true) getfirstallakademik();
+      });
+    });
+
     InternetConnectionChecker().onStatusChange.listen((event) {
+      if (!mounted) return;
       setState(() {
         if (event == InternetConnectionStatus.connected) {
           isInternet = true;
@@ -87,7 +94,7 @@ class _AkademikPageState extends State<AkademikPage> {
         lastpage = prov.lastpage;
       });
 
-      for (var element in prov.listakaumum[page].data!) {
+      for (var element in prov.listakaumum[0].data!) {
         dataakaumum.add(element);
       }
 
@@ -98,7 +105,6 @@ class _AkademikPageState extends State<AkademikPage> {
       setState(() {
         isloading = false;
       });
-      // print("first init gagal");
     });
 
     /////////get akademik khusus here////////
@@ -107,7 +113,7 @@ class _AkademikPageState extends State<AkademikPage> {
         lastpagekhusus = prov.lastpagekhusus;
       });
 
-      for (var element in prov.listakakhusus[pagekhusus].data!) {
+      for (var element in prov.listakakhusus[0].data!) {
         dataakakhusus.add(element);
       }
 
@@ -118,23 +124,25 @@ class _AkademikPageState extends State<AkademikPage> {
       setState(() {
         isloading = false;
       });
-      // print("init khusus gagal $onError");
     });
   }
 
   getmoreakademikumum(lastpage) {
     var prov = Provider.of<AkademikProvider>(context, listen: false);
+    int page = 0;
 
     // print("ambil data page $i tampilkan array aka ke$page");
     for (var i = 2; i <= lastpage; i++) {
       prov.getmoreakademikumum(i).then((value) {
         page++;
+        
         for (var element in prov.listakaumum[page].data!) {
           dataakaumum.add(element);
         }
+
         setState(() {});
       }).catchError((onError) {
-        print("error $onError umum page $i");
+        // print("error $onError umum page $i");
       });
     }
   }
@@ -152,6 +160,7 @@ class _AkademikPageState extends State<AkademikPage> {
 
   _getmoreakademikkhusus() {
     var prov = Provider.of<AkademikProvider>(context, listen: false);
+    int pagekhusus = 0;
 
     if (pagekhusus < lastpagekhusus) {
       prov.moreakademikkhusus(pagekhusus + 2).then((value) {
@@ -167,7 +176,7 @@ class _AkademikPageState extends State<AkademikPage> {
         pagekhusus++;
         setState(() {});
       }).catchError((onError) {
-        print("gagal menambahkan page ke ${pagekhusus + 2}");
+        // print("gagal menambahkan page ke ${pagekhusus + 2}");
       });
     }
   }
@@ -316,208 +325,254 @@ class _AkademikPageState extends State<AkademikPage> {
 
                     ////content
                     (groupvalue == 0)
-                        ? Expanded(
-                            child: Card(
-                            color: Colors.white,
-                            elevation: 2,
-                            semanticContainer: false,
-                            margin: EdgeInsets.all(10),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 8, horizontal: 12),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: const [
-                                      Text("Mata Pelajaran"),
-                                      Text("Nilai"),
-                                    ],
-                                  ),
+                        ? dataakaumum.isEmpty
+                            ? Expanded(
+                                child: Stack(
+                                  children: const [
+                                    NoDataWidget(message: ""),
+                                    Align(
+                                      alignment: Alignment(-0.05, 0.5),
+                                      child: Text(
+                                        "Belum ada data akademik umum",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                Container(
-                                  width: double.infinity,
-                                  height: 0.5,
-                                  color: Color(0xFFFF8C00),
+                              )
+                            : Expanded(
+                                child: Card(
+                                color: Colors.white,
+                                elevation: 2,
+                                semanticContainer: false,
+                                margin: EdgeInsets.all(10),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
-                                Expanded(
-                                  child: ListView.builder(
-                                    shrinkWrap: true,
-                                    itemCount: (selectedNilai == "SEMUA")
-                                        ? dataakaumum.length
-                                        : dataumumfiltered.length,
-                                    itemBuilder: (context, index) {
-                                      return Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 10, horizontal: 13),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.max,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Flexible(
-                                              flex: 9,
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    (selectedNilai == "SEMUA")
-                                                        ? dataakaumum[index]
-                                                            .namapel!
-                                                        : dataumumfiltered[
-                                                                index]
-                                                            .namapel!,
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
-                                                  Row(
+                                child: Column(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 8, horizontal: 12),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: const [
+                                          Text("Mata Pelajaran"),
+                                          Text("Nilai"),
+                                        ],
+                                      ),
+                                    ),
+                                    Container(
+                                      width: double.infinity,
+                                      height: 0.5,
+                                      color: Color(0xFFFF8C00),
+                                    ),
+                                    Expanded(
+                                      child: ListView.builder(
+                                        shrinkWrap: true,
+                                        itemCount: (selectedNilai == "SEMUA")
+                                            ? dataakaumum.length
+                                            : dataumumfiltered.length,
+                                        itemBuilder: (context, index) {
+                                          return Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                              vertical: 10,
+                                              horizontal: 13,
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.max,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Flexible(
+                                                  flex: 9,
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
                                                     children: [
                                                       Text(
                                                         (selectedNilai ==
                                                                 "SEMUA")
-                                                            ? "${DateFormat("d MMMM yyyy", "ID_id").format(dataakaumum[index].tanggal!)}   "
-                                                            : "${DateFormat("d MMMM yyyy", "ID_id").format(dataumumfiltered[index].tanggal!)}   ",
-                                                        style: TextStyle(
-                                                            fontSize: 13),
-                                                      ),
-                                                      Text(
-                                                        (selectedNilai ==
-                                                                "SEMUA")
                                                             ? dataakaumum[index]
-                                                                .tipe!
+                                                                .namapel!
                                                             : dataumumfiltered[
                                                                     index]
-                                                                .tipe!,
+                                                                .namapel!,
                                                         style: TextStyle(
-                                                            color: Color(
-                                                                0xFFFF8C00),
-                                                            fontSize: 13),
-                                                      )
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                      ),
+                                                      Row(
+                                                        children: [
+                                                          Text(
+                                                            (selectedNilai ==
+                                                                    "SEMUA")
+                                                                ? "${DateFormat("d MMMM yyyy", "ID_id").format(dataakaumum[index].tanggal!)}   "
+                                                                : "${DateFormat("d MMMM yyyy", "ID_id").format(dataumumfiltered[index].tanggal!)}   ",
+                                                            style: TextStyle(
+                                                                fontSize: 13),
+                                                          ),
+                                                          Text(
+                                                            (selectedNilai == "SEMUA")
+                                                                ? dataakaumum[
+                                                                        index]
+                                                                    .tipe!
+                                                                : dataumumfiltered[
+                                                                        index]
+                                                                    .tipe!,
+                                                            style: TextStyle(
+                                                                color: Color(
+                                                                    0xFFFF8C00),
+                                                                fontSize: 13),
+                                                          )
+                                                        ],
+                                                      ),
                                                     ],
                                                   ),
-                                                ],
-                                              ),
+                                                ),
+                                                Flexible(
+                                                    flex: 1,
+                                                    child: Text((selectedNilai ==
+                                                            "SEMUA")
+                                                        ? "${dataakaumum[index].nilainya}"
+                                                        : "${dataumumfiltered[index].nilainya}"))
+                                              ],
                                             ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ))
+                        : dataakakhusus.isEmpty
+                            ? Expanded(
+                                child: Stack(
+                                  children: const [
+                                    NoDataWidget(message: ""),
+                                    Align(
+                                      alignment: Alignment(-0.05, 0.5),
+                                      child: Text(
+                                        "Belum ada data akademik khusus",
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              )
+                            : 
+                            Expanded(
+                                child: Card(
+                                  color: Colors.white,
+                                  elevation: 1,
+                                  margin: EdgeInsets.fromLTRB(10, 5, 10, 10),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8)),
+                                  child: Column(
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: 8, horizontal: 12),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.max,
+                                          children: const [
                                             Flexible(
-                                                flex: 1,
-                                                child: Text((selectedNilai ==
-                                                        "SEMUA")
-                                                    ? "${dataakaumum[index].nilainya}"
-                                                    : "${dataumumfiltered[index].nilainya}"))
+                                                flex: 9,
+                                                child: SizedBox(
+                                                    width: double.infinity,
+                                                    child: Text("Surah"))),
+                                            Flexible(
+                                                flex: 2,
+                                                child: SizedBox(
+                                                    width: double.infinity,
+                                                    child: Text(
+                                                      "Ayat",
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                    ))),
                                           ],
                                         ),
-                                      );
-                                    },
+                                      ),
+                                      Container(
+                                        width: double.infinity,
+                                        height: 0.4,
+                                        color: Color(0xFFFF8C00),
+                                      ),
+                                      Expanded(
+                                        child: ListView.builder(
+                                          controller: _controller,
+                                          shrinkWrap: true,
+                                          itemCount: dataakakhusus.length,
+                                          itemBuilder: (context, index) {
+                                            return Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 8,
+                                                      horizontal: 12),
+                                              child: Row(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Flexible(
+                                                      flex: 9,
+                                                      child: SizedBox(
+                                                        width: double.infinity,
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Text(
+                                                              dataakakhusus[
+                                                                      index]
+                                                                  .surah!,
+                                                              style: TextStyle(
+                                                                  fontSize: 16,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold),
+                                                            ),
+                                                            Text(
+                                                                "Pengajar : ${dataakakhusus[index].nama}"),
+                                                            Text(DateFormat(
+                                                                    "d MMMM yyyy",
+                                                                    "ID_id")
+                                                                .format(
+                                                                    dataakakhusus[
+                                                                            index]
+                                                                        .tgl!)),
+                                                          ],
+                                                        ),
+                                                      )),
+                                                  Flexible(
+                                                      flex: 2,
+                                                      child: SizedBox(
+                                                          width:
+                                                              double.infinity,
+                                                          child: Text(
+                                                            dataakakhusus[index]
+                                                                .ayat!,
+                                                            textAlign: TextAlign
+                                                                .center,
+                                                          ))),
+                                                ],
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ],
-                            ),
-                          ))
-                        : Expanded(
-                            child: Card(
-                              color: Colors.white,
-                              elevation: 1,
-                              margin: EdgeInsets.fromLTRB(10, 5, 10, 10),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8)),
-                              child: Column(
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        vertical: 8, horizontal: 12),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: const [
-                                        Flexible(
-                                            flex: 9,
-                                            child: SizedBox(
-                                                width: double.infinity,
-                                                child: Text("Surah"))),
-                                        Flexible(
-                                            flex: 2,
-                                            child: SizedBox(
-                                                width: double.infinity,
-                                                child: Text(
-                                                  "Ayat",
-                                                  textAlign: TextAlign.center,
-                                                ))),
-                                      ],
-                                    ),
-                                  ),
-                                  Container(
-                                    width: double.infinity,
-                                    height: 0.4,
-                                    color: Color(0xFFFF8C00),
-                                  ),
-                                  Expanded(
-                                    child: ListView.builder(
-                                      controller: _controller,
-                                      shrinkWrap: true,
-                                      itemCount: dataakakhusus.length,
-                                      itemBuilder: (context, index) {
-                                        return Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 8, horizontal: 12),
-                                          child: Row(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Flexible(
-                                                  flex: 9,
-                                                  child: SizedBox(
-                                                    width: double.infinity,
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Text(
-                                                          dataakakhusus[index]
-                                                              .surah!,
-                                                          style: TextStyle(
-                                                              fontSize: 16,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold),
-                                                        ),
-                                                        Text(
-                                                            "Pengajar : ${dataakakhusus[index].nama}"),
-                                                        Text(DateFormat(
-                                                                "d MMMM yyyy",
-                                                                "ID_id")
-                                                            .format(
-                                                                dataakakhusus[
-                                                                        index]
-                                                                    .tgl!)),
-                                                      ],
-                                                    ),
-                                                  )),
-                                              Flexible(
-                                                  flex: 2,
-                                                  child: SizedBox(
-                                                      width: double.infinity,
-                                                      child: Text(
-                                                        dataakakhusus[index]
-                                                            .ayat!,
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                      ))),
-                                            ],
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          )
+                              )
                   ],
                 ),
     );

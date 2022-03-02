@@ -2,9 +2,7 @@
 
 import 'dart:async';
 
-import 'package:edu_ready/pages/informasi/informasi_page.dart';
-import 'package:edu_ready/pages/pembayaran/pembayaran_page.dart';
-import 'package:edu_ready/pages/saldo/top_up_page.dart';
+import 'package:edu_ready/pages/batasmateri/batas_materi_page.dart';
 import 'package:edu_ready/pages/welcome/home_page.dart';
 import 'package:edu_ready/pages/welcome/login_page.dart';
 import 'package:edu_ready/providers/auth_provider.dart';
@@ -30,7 +28,7 @@ class _SplashScreenState extends State<SplashScreen> {
               context,
               CupertinoPageRoute(
                 builder: (context) {
-                  return PembayaranPage();
+                  return HomePage();
                 },
               ),
             );

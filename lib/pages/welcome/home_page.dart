@@ -39,7 +39,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   bool firstinitdashboard = true;
   bool statusPenilaian = false;
-  bool isInternet = false;
+  bool isInternet = true;
 
   String name = "";
   String statusErrorInit = "";
@@ -58,6 +58,12 @@ class _HomePageState extends State<HomePage> {
   }
 
   void cekInternet() {
+    InternetConnectionChecker().hasConnection.then((value) {
+      setState((){
+        isInternet = true;
+        getfirstdatadashboard();
+      });
+    });
     InternetConnectionChecker().onStatusChange.listen((event) {
       setState(() {
         switch (event) {
@@ -71,7 +77,6 @@ class _HomePageState extends State<HomePage> {
         }
       });
     });
-    
   }
 
   Future<void> initial() async {
@@ -87,26 +92,26 @@ class _HomePageState extends State<HomePage> {
 
   void getfirstdatadashboard() {
     Provider.of<DashboardProvider>(context, listen: false)
-          .getDataDashboard()
-          .then((value) => () {
-                setState(() {});
-              })
-          .catchError((onError) {
-        setState(() {
-          statusErrorInit = onError.toString();
-        });
-
-        showCupertinoDialog(
-          barrierDismissible: true,
-          context: context,
-          builder: (context) {
-            return CupertinoAlertDialog(
-              title: Text("Error"),
-              content: Text("$onError"),
-            );
-          },
-        );
+        .getDataDashboard()
+        .then((value) => () {
+              setState(() {});
+            })
+        .catchError((onError) {
+      setState(() {
+        statusErrorInit = onError.toString();
       });
+
+      showCupertinoDialog(
+        barrierDismissible: true,
+        context: context,
+        builder: (context) {
+          return CupertinoAlertDialog(
+            title: Text("Error"),
+            content: Text("$onError"),
+          );
+        },
+      );
+    });
   }
 
   BarChartGroupData makeGroupData(int x, double y1, double y2) {
@@ -1809,5 +1814,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
-

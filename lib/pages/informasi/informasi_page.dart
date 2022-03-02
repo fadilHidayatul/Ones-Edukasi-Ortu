@@ -25,9 +25,8 @@ class InformasiPage extends StatefulWidget {
 }
 
 class _InformasiPageState extends State<InformasiPage> {
-  bool firstinit = true;
-  bool isloading = false;
-  bool isInternet = false;
+  bool isloading = true;
+  bool isInternet = true;
 
   int? groupValue = 0;
   List<String> item = ["Terbaru", "Riwayat Informasi"];
@@ -48,7 +47,16 @@ class _InformasiPageState extends State<InformasiPage> {
   }
 
   _checkInternet() {
+    InternetConnectionChecker().hasConnection.then((value) {
+      if (!mounted) return;
+      setState(() {
+        isInternet = value;
+        if (value == true) _getfirstallinformasi();
+      });
+    });
+
     InternetConnectionChecker().onStatusChange.listen((event) {
+      if (!mounted) return;
       setState(() {
         if (event == InternetConnectionStatus.connected) {
           isInternet = true;
@@ -91,11 +99,12 @@ class _InformasiPageState extends State<InformasiPage> {
         }
       }
 
+      if (!mounted) return;
       setState(() {
         isloading = false;
       });
     }).catchError((onError) {
-      // print("on error init $onError");
+      if (!mounted) return;
       setState(() {
         isloading = false;
       });

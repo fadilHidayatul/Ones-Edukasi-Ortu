@@ -32,16 +32,14 @@ class _PembayaranPageState extends State<PembayaranPage> {
 
   int groupvalue = 0;
   int tempTotal = 0;
-  int page = 0;
+  
   int lastpage = 0;
-  int pageRiwayat = 0;
   int lastPageRiwayat = 0;
 
-  bool firstinit = true;
-  bool firstloading = false;
+  bool firstloading = true;
   bool loadingconfirm = false;
   bool stoploadmore = false;
-  bool isInternet = false;
+  bool isInternet = true;
 
   List<bool> isChecked = [];
   List<DatumBayar> allbayar = [];
@@ -76,7 +74,19 @@ class _PembayaranPageState extends State<PembayaranPage> {
   }
 
   _checkInternet() {
+    InternetConnectionChecker().hasConnection.then((value){
+      if(!mounted)return;
+      setState(() {
+        isInternet = value;
+        if (value == true) {
+          _getfirstpembayaran();
+          _getfirstriwayatpembayaran();
+        }
+      });
+    });
+
     InternetConnectionChecker().onStatusChange.listen((event) {
+      if(!mounted)return;
       setState(() {
         if (event == InternetConnectionStatus.connected) {
           isInternet = true;
@@ -99,15 +109,18 @@ class _PembayaranPageState extends State<PembayaranPage> {
         selectedBayar.clear();
         sendToAPI.clear();
         tempTotal = 0;
-        lastpage = prov.listpembayaran[page].lastPage!;
+        lastpage = prov.listpembayaran[0].lastPage!;
 
-        for (var element in prov.listpembayaran[page].data!) {
+        for (var element in prov.listpembayaran[0].data!) {
           allbayar.add(element);
         }
+
+        if(!mounted)return;
         setState(() => firstloading = false);
       }
       isChecked = List<bool>.filled(allbayar.length, false);
     }).catchError((onError) {
+      if(!mounted)return;
       setState(() => firstloading = false);
       showCupertinoDialog(
         barrierDismissible: true,
@@ -122,10 +135,11 @@ class _PembayaranPageState extends State<PembayaranPage> {
 
   _getmorepembayaran() {
     var prov = Provider.of<PembayaranProvider>(context, listen: false);
+    int page = 1;
 
     if (page < lastpage) {
-      prov.getmorepembayaran(page + 2).then((value) {
-        var newdata = prov.listpembayaran[page + 1].data!;
+      prov.getmorepembayaran(page + 1).then((value) {
+        var newdata = prov.listpembayaran[page].data!;
 
         for (var element in newdata) {
           allbayar.add(element);
@@ -146,18 +160,20 @@ class _PembayaranPageState extends State<PembayaranPage> {
     prov.getfirstriwayatpembayaran().then((value) {
       if (prov.listriwayatbayar.isNotEmpty) {
         allriwayat.clear();
-        lastPageRiwayat = prov.listriwayatbayar[pageRiwayat].lastPage!;
+        lastPageRiwayat = prov.listriwayatbayar[0].lastPage!;
 
-        for (var element in prov.listriwayatbayar[pageRiwayat].data!) {
+        for (var element in prov.listriwayatbayar[0].data!) {
           allriwayat.add(element);
         }
 
         ///ini untuk ambil page 1+1
-        pageRiwayat++;
+        // pageRiwayat++;
 
+        if(!mounted)return;
         setState(() => firstloading = false);
       }
     }).catchError((onError) {
+      if(!mounted)return;
       setState(() => firstloading = false);
       showCupertinoDialog(
         barrierDismissible: true,
@@ -172,6 +188,7 @@ class _PembayaranPageState extends State<PembayaranPage> {
 
   _getmoreriwayatpembayaran() async {
     var prov = Provider.of<PembayaranProvider>(context, listen: false);
+    int pageRiwayat = 1;
 
     if (pageRiwayat < lastPageRiwayat) {
       await prov.getmoreriwayatpembayaran(pageRiwayat + 1).then((value) {
@@ -182,9 +199,10 @@ class _PembayaranPageState extends State<PembayaranPage> {
         }
         pageRiwayat++;
 
+        if(!mounted)return;
         setState(() {});
       }).catchError((onError) {
-        print("ERror saat page $pageRiwayat  =  $onError");
+        // print("ERror saat page $pageRiwayat  =  $onError");
       });
       pageRiwayat++;
     } else {
