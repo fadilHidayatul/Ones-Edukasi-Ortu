@@ -31,7 +31,6 @@ class _HistorySaldoState extends State<HistorySaldo> {
   late List<Datum> dummy = [];
   // int currentmax = 10;
   int currentmax = 0;
-  int page = 0; // == 1
   int lastpage = 0;
 
   @override
@@ -81,7 +80,7 @@ class _HistorySaldoState extends State<HistorySaldo> {
         .then((value) {
       //generate data page 1 ke list ini
       dummy = Provider.of<HistorySaldoProvider>(context, listen: false)
-          .listHistory[page]
+          .listHistory[0]
           .data!;
       currentmax = dummy.length;
       lastpage =
@@ -100,6 +99,7 @@ class _HistorySaldoState extends State<HistorySaldo> {
   _getMoreList() {
     //karena data per page, maka harus di tambah2 agar data bertukar
     var getprov = Provider.of<HistorySaldoProvider>(context, listen: false);
+    int page = 1;
 
     //kemungkinan tambah API disini
     //panggil api
@@ -108,21 +108,27 @@ class _HistorySaldoState extends State<HistorySaldo> {
     //***tambah data ke list local masih gagal */
 
     if (page < lastpage) {
-      getprov.loadMoreData(page + 2).then((value) {
-        var newlenghtdata = getprov.listHistory[page + 1].data!.length;
-        var newdata = getprov.listHistory[page + 1].data!;
+      getprov.loadMoreData(page + 1).then((value) {
+        var newdata = getprov.listHistory[page].data!;
+        // var newlenghtdata = getprov.listHistory[page].data!.length;
 
-        var iteration = 0;
-        for (var i = currentmax; i < currentmax + newlenghtdata; i++) {
-          dummy.add(newdata[iteration]);
-          // print("${ newdata[iteration] }");
-          // print("iterate : $iteration");
-          iteration++;
-        }
-        currentmax = currentmax + newlenghtdata;
-        page = page + 1;
+        // var iteration = 0;
+        // for (var i = currentmax; i < currentmax + newlenghtdata; i++) {
+        //   dummy.add(newdata[iteration]);
+        //   print("${ newdata[iteration] }");
+        //   print("iterate : $iteration");
+        //   iteration++;
+        // }
+        // currentmax = currentmax + newlenghtdata;
+        // page = page + 1;
 
         // print(dummy.length);
+
+        for (var element in newdata) {
+          dummy.add(element);
+        }
+        page++;
+
         setState(() {});
       });
     }

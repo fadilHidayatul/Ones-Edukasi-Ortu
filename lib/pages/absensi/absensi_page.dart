@@ -31,7 +31,6 @@ class _AbsensiPageState extends State<AbsensiPage> {
   final ScrollController _scrollController = ScrollController();
   List<Datum> dayList = [];
   int countDay = 0;
-  int page = 0;
   int lastpage = 0;
 
   @override
@@ -82,7 +81,7 @@ class _AbsensiPageState extends State<AbsensiPage> {
         .getabsensiharian()
         .then((value) {
       dayList = Provider.of<AbsensiProvider>(context, listen: false)
-          .listabsensiharian[page]
+          .listabsensiharian[0]
           .data!;
       countDay = dayList.length;
       lastpage = Provider.of<AbsensiProvider>(context, listen: false).lastpage;
@@ -119,18 +118,15 @@ class _AbsensiPageState extends State<AbsensiPage> {
     // print("last page : $lastpage");
     // print("page yg diambil saat ini : ${page + 2}");
     var prov = Provider.of<AbsensiProvider>(context, listen: false);
+    int page = 1;
 
     if (page < lastpage) {
-      prov.loadMoreAbsensiHarian(page + 2).then((value) {
-        var newData = prov.listabsensiharian[page + 1].data;
-        var newDataLength = newData!.length;
-
-        int loop = 0;
-        for (var i = countDay; i < countDay + newDataLength; i++) {
-          dayList.add(newData[loop]);
-          loop++;
+      prov.loadMoreAbsensiHarian(page + 1).then((value) {
+        var newData = prov.listabsensiharian[page].data;
+  
+        for (var element in newData!) {
+          dayList.add(element);
         }
-        countDay = countDay + newDataLength;
         page++;
 
         //setstate untuk notice tampilan kalo loadmore udh jalan
@@ -397,7 +393,7 @@ class _AbsensiPageState extends State<AbsensiPage> {
                                           data =
                                               value.listabsensibulanan[0].data;
                                         }
-                                                                 
+
                                         return Expanded(
                                             child:
                                                 (value.listabsensibulanan

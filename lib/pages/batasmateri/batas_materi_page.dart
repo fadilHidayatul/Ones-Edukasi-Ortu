@@ -4,7 +4,6 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:edu_ready/model/mapel.dart';
 import 'package:edu_ready/providers/materi_provider.dart';
-import 'package:edu_ready/utils/internet_checker.dart';
 import 'package:edu_ready/widgets/batas_materi_popup.dart';
 import 'package:edu_ready/widgets/card_appbar_widget.dart';
 import 'package:edu_ready/widgets/no_data_widget.dart';

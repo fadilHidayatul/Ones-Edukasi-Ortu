@@ -1,6 +1,5 @@
 // ignore_for_file: prefer_const_constructors
 
-import 'package:edu_ready/pages/pembayaran/pembayaran_page.dart';
 import 'package:edu_ready/pages/welcome/home_page.dart';
 import 'package:edu_ready/providers/auth_provider.dart';
 import 'package:flutter/cupertino.dart';

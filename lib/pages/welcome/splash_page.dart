@@ -2,7 +2,6 @@
 
 import 'dart:async';
 
-import 'package:edu_ready/pages/batasmateri/batas_materi_page.dart';
 import 'package:edu_ready/pages/welcome/home_page.dart';
 import 'package:edu_ready/pages/welcome/login_page.dart';
 import 'package:edu_ready/providers/auth_provider.dart';

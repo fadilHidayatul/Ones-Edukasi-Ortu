@@ -160,20 +160,19 @@ class _AkademikPageState extends State<AkademikPage> {
 
   _getmoreakademikkhusus() {
     var prov = Provider.of<AkademikProvider>(context, listen: false);
-    int pagekhusus = 0;
+    int pagekhusus = 1;
 
     if (pagekhusus < lastpagekhusus) {
-      prov.moreakademikkhusus(pagekhusus + 2).then((value) {
-        var newdata = prov.listakakhusus[pagekhusus + 1].data;
+      prov.moreakademikkhusus(pagekhusus + 1).then((value) {
+        var newdata = prov.listakakhusus[pagekhusus].data;
 
-        int iteration = 0;
-        for (var i = dataakakhusus.length;
-            i < dataakakhusus.length + newdata!.length;
-            i++) {
-          dataakakhusus.add(newdata[iteration]);
-          iteration++;
+        for (var element in newdata!) {
+          dataakakhusus.add(element);
         }
+
         pagekhusus++;
+
+        if(!mounted)return;
         setState(() {});
       }).catchError((onError) {
         // print("gagal menambahkan page ke ${pagekhusus + 2}");
