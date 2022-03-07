@@ -32,7 +32,7 @@ class _PembayaranPageState extends State<PembayaranPage> {
 
   int groupvalue = 0;
   int tempTotal = 0;
-  
+
   int lastpage = 0;
   int lastPageRiwayat = 0;
 
@@ -68,14 +68,14 @@ class _PembayaranPageState extends State<PembayaranPage> {
       if (_controllerRiwayat.position.pixels ==
           _controllerRiwayat.position.maxScrollExtent) {
         _getmoreriwayatpembayaran();
-      }
+      } 
     });
     super.didChangeDependencies();
   }
 
   _checkInternet() {
-    InternetConnectionChecker().hasConnection.then((value){
-      if(!mounted)return;
+    InternetConnectionChecker().hasConnection.then((value) {
+      if (!mounted) return;
       setState(() {
         isInternet = value;
         if (value == true) {
@@ -86,7 +86,7 @@ class _PembayaranPageState extends State<PembayaranPage> {
     });
 
     InternetConnectionChecker().onStatusChange.listen((event) {
-      if(!mounted)return;
+      if (!mounted) return;
       setState(() {
         if (event == InternetConnectionStatus.connected) {
           isInternet = true;
@@ -101,7 +101,7 @@ class _PembayaranPageState extends State<PembayaranPage> {
 
   _getfirstpembayaran() {
     var prov = Provider.of<PembayaranProvider>(context, listen: false);
-    firstloading = true;
+    setState(() => firstloading = true);
 
     prov.getfirstpembayaran().then((value) {
       if (prov.listpembayaran.isNotEmpty) {
@@ -115,12 +115,12 @@ class _PembayaranPageState extends State<PembayaranPage> {
           allbayar.add(element);
         }
 
-        if(!mounted)return;
+        if (!mounted) return;
         setState(() => firstloading = false);
       }
       isChecked = List<bool>.filled(allbayar.length, false);
     }).catchError((onError) {
-      if(!mounted)return;
+      if (!mounted) return;
       setState(() => firstloading = false);
       showCupertinoDialog(
         barrierDismissible: true,
@@ -155,7 +155,7 @@ class _PembayaranPageState extends State<PembayaranPage> {
 
   _getfirstriwayatpembayaran() {
     var prov = Provider.of<PembayaranProvider>(context, listen: false);
-    firstloading = true;
+    setState(() => firstloading = true);
 
     prov.getfirstriwayatpembayaran().then((value) {
       if (prov.listriwayatbayar.isNotEmpty) {
@@ -169,11 +169,11 @@ class _PembayaranPageState extends State<PembayaranPage> {
         ///ini untuk ambil page 1+1
         // pageRiwayat++;
 
-        if(!mounted)return;
+        if (!mounted) return;
         setState(() => firstloading = false);
       }
     }).catchError((onError) {
-      if(!mounted)return;
+      if (!mounted) return;
       setState(() => firstloading = false);
       showCupertinoDialog(
         barrierDismissible: true,
@@ -199,7 +199,7 @@ class _PembayaranPageState extends State<PembayaranPage> {
         }
         pageRiwayat++;
 
-        if(!mounted)return;
+        if (!mounted) return;
         setState(() {});
       }).catchError((onError) {
         // print("ERror saat page $pageRiwayat  =  $onError");
@@ -273,16 +273,20 @@ class _PembayaranPageState extends State<PembayaranPage> {
                         ? (allbayar.isEmpty)
                             ? Expanded(
                                 child: NoDataWidget(
-                                    message: "Tidak ada data pembayaran"),
+                                  message: "Tidak ada data pembayaran",
+                                ),
                               )
                             : Expanded(
                                 child: Column(
                                   mainAxisSize: MainAxisSize.max,
                                   children: [
                                     Expanded(
-                                      child: SizedBox(
-                                        height: double.infinity,
-                                        width: double.infinity,
+                                      child: RefreshIndicator(
+                                        onRefresh: () async {
+                                          await Future.delayed(
+                                              Duration(seconds: 2));
+                                          await _getfirstpembayaran();
+                                        },
                                         child: ListView.builder(
                                           controller: _controllerBayar,
                                           shrinkWrap: true,
@@ -789,7 +793,8 @@ class _PembayaranPageState extends State<PembayaranPage> {
                         : (allriwayat.isEmpty)
                             ? Expanded(
                                 child: NoDataWidget(
-                                    message: "TIdak ada riwayat pembayaran"),
+                                  message: "TIdak ada riwayat pembayaran",
+                                ),
                               )
                             : Expanded(
                                 child: Column(
@@ -815,157 +820,173 @@ class _PembayaranPageState extends State<PembayaranPage> {
                                       ),
                                     ),
                                     Expanded(
-                                      child: ListView.builder(
-                                        controller: _controllerRiwayat,
-                                        itemCount: allriwayat.length,
-                                        itemBuilder: (context, index) {
-                                          ///untuk pengecekan load more dibawah list
-                                          var tot = index + 1;
-                                          if (allriwayat.length >= 10) {
-                                            if (!stoploadmore) {
-                                              if (tot == allriwayat.length) {
-                                                return Padding(
-                                                  padding: EdgeInsets.symmetric(
-                                                      vertical: 4),
-                                                  child:
-                                                      CupertinoActivityIndicator(),
-                                                );
+                                      child: RefreshIndicator(
+                                        onRefresh: () async {
+                                          await Future.delayed(
+                                              Duration(seconds: 2));
+                                          await _getfirstriwayatpembayaran();
+                                        },
+                                        child: ListView.builder(
+                                          controller: _controllerRiwayat,
+                                          shrinkWrap: false,
+                                          itemCount: allriwayat.length,
+                                          itemBuilder: (context, index) {
+                                            ///untuk pengecekan load more dibawah list
+                                            var tot = index + 1;
+                                            if (allriwayat.length >= 10) {
+                                              if (!stoploadmore) {
+                                                if (tot == allriwayat.length) {
+                                                  return Padding(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            vertical: 4),
+                                                    child:
+                                                        CupertinoActivityIndicator(),
+                                                  );
+                                                }
                                               }
                                             }
-                                          }
-                                          return GestureDetector(
-                                            child: Card(
-                                              margin: EdgeInsets.fromLTRB(
-                                                  8, 2, 8, 12),
-                                              child: Padding(
-                                                padding: EdgeInsets.fromLTRB(
-                                                    10, 12, 3, 14),
-                                                child: Row(
-                                                  mainAxisSize:
-                                                      MainAxisSize.max,
-                                                  children: [
-                                                    Flexible(
-                                                      flex: 4,
-                                                      child: SizedBox(
-                                                        width: double.infinity,
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            Text(
-                                                              "No Kwitansi :",
-                                                              style: TextStyle(
-                                                                  fontSize: 13),
-                                                            ),
-                                                            Divider(
-                                                              thickness: 0,
-                                                              color: Colors
-                                                                  .transparent,
-                                                              height: 5,
-                                                            ),
-                                                            Text(
-                                                              allriwayat[index]
-                                                                  .nokwitansi!,
-                                                              style: TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
+                                            return GestureDetector(
+                                              child: Card(
+                                                margin: EdgeInsets.fromLTRB(
+                                                    8, 2, 8, 12),
+                                                child: Padding(
+                                                  padding: EdgeInsets.fromLTRB(
+                                                      10, 12, 3, 14),
+                                                  child: Row(
+                                                    mainAxisSize:
+                                                        MainAxisSize.max,
+                                                    children: [
+                                                      Flexible(
+                                                        flex: 4,
+                                                        child: SizedBox(
+                                                          width:
+                                                              double.infinity,
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              Text(
+                                                                "No Kwitansi :",
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        13),
                                                               ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    Flexible(
-                                                      flex: 3,
-                                                      child: SizedBox(
-                                                        width: double.infinity,
-                                                        child: Text(
-                                                          allriwayat[index]
-                                                                      .status ==
-                                                                  "butuh konfirmasi"
-                                                              ? "Menunggu Konfirmasi"
-                                                              : allriwayat[index]
-                                                                          .status ==
-                                                                      null
-                                                                  ? "Ditolak"
-                                                                  : "Lunas",
-                                                          textAlign:
-                                                              TextAlign.center,
-                                                          style: TextStyle(
-                                                            color: allriwayat[
-                                                                            index]
-                                                                        .status ==
-                                                                    "butuh konfirmasi"
-                                                                ? Color(0xFFFF8C00)
-                                                                    .withOpacity(
-                                                                        0.7)
-                                                                : allriwayat[index]
-                                                                            .status ==
-                                                                        null
-                                                                    ? Colors.red
-                                                                        .withOpacity(
-                                                                            0.7)
-                                                                    : Colors
-                                                                        .blue
-                                                                        .withOpacity(
-                                                                            0.7),
+                                                              Divider(
+                                                                thickness: 0,
+                                                                color: Colors
+                                                                    .transparent,
+                                                                height: 5,
+                                                              ),
+                                                              Text(
+                                                                allriwayat[
+                                                                        index]
+                                                                    .nokwitansi!,
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                              ),
+                                                            ],
                                                           ),
                                                         ),
                                                       ),
-                                                    ),
-                                                  ],
+                                                      Flexible(
+                                                        flex: 3,
+                                                        child: SizedBox(
+                                                          width:
+                                                              double.infinity,
+                                                          child: Text(
+                                                            allriwayat[index]
+                                                                        .status ==
+                                                                    "butuh konfirmasi"
+                                                                ? "Menunggu Konfirmasi"
+                                                                : allriwayat[index]
+                                                                            .status ==
+                                                                        null
+                                                                    ? "Ditolak"
+                                                                    : "Lunas",
+                                                            textAlign: TextAlign
+                                                                .center,
+                                                            style: TextStyle(
+                                                              color: allriwayat[
+                                                                              index]
+                                                                          .status ==
+                                                                      "butuh konfirmasi"
+                                                                  ? Color(0xFFFF8C00)
+                                                                      .withOpacity(
+                                                                          0.7)
+                                                                  : allriwayat[index]
+                                                                              .status ==
+                                                                          null
+                                                                      ? Colors
+                                                                          .red
+                                                                          .withOpacity(
+                                                                              0.7)
+                                                                      : Colors
+                                                                          .blue
+                                                                          .withOpacity(
+                                                                              0.7),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                            onTap: () async {
-                                              Provider.of<PembayaranProvider>(
-                                                      context,
-                                                      listen: false)
-                                                  .getdetailriwayat(
-                                                      allriwayat[index]
-                                                          .nokwitansi!)
-                                                  .then((value) {
-                                                var detail = Provider.of<
-                                                    PembayaranProvider>(
-                                                  context,
-                                                  listen: false,
-                                                ).listdetailriwayat;
+                                              onTap: () async {
+                                                Provider.of<PembayaranProvider>(
+                                                        context,
+                                                        listen: false)
+                                                    .getdetailriwayat(
+                                                        allriwayat[index]
+                                                            .nokwitansi!)
+                                                    .then((value) {
+                                                  var detail = Provider.of<
+                                                      PembayaranProvider>(
+                                                    context,
+                                                    listen: false,
+                                                  ).listdetailriwayat;
 
-                                                if (detail != []) {
-                                                  String status = "";
-                                                  status = allriwayat[index]
-                                                          .status ??
-                                                      "";
-                                                  showDialog(
-                                                      context: context,
-                                                      builder: (BuildContext
-                                                          context) {
-                                                        return PopUpDetail(
-                                                          detail: detail,
-                                                          status: status,
-                                                          nokwitansi:
-                                                              allriwayat[index]
-                                                                  .nokwitansi!,
-                                                        );
-                                                      });
-                                                }
-                                              }).catchError((onError) {
-                                                showCupertinoDialog(
-                                                  context: context,
-                                                  builder: (context) {
-                                                    return CupertinoAlertDialog(
-                                                      title: Text("Error"),
-                                                      content: Text(
-                                                          onError.toString()),
-                                                    );
-                                                  },
-                                                );
-                                              });
-                                            },
-                                          );
-                                        },
+                                                  if (detail != []) {
+                                                    String status = "";
+                                                    status = allriwayat[index]
+                                                            .status ??
+                                                        "";
+                                                    showDialog(
+                                                        context: context,
+                                                        builder: (BuildContext
+                                                            context) {
+                                                          return PopUpDetail(
+                                                            detail: detail,
+                                                            status: status,
+                                                            nokwitansi:
+                                                                allriwayat[
+                                                                        index]
+                                                                    .nokwitansi!,
+                                                          );
+                                                        });
+                                                  }
+                                                }).catchError((onError) {
+                                                  showCupertinoDialog(
+                                                    context: context,
+                                                    builder: (context) {
+                                                      return CupertinoAlertDialog(
+                                                        title: Text("Error"),
+                                                        content: Text(
+                                                            onError.toString()),
+                                                      );
+                                                    },
+                                                  );
+                                                });
+                                              },
+                                            );
+                                          },
+                                        ),
                                       ),
                                     ),
                                   ],

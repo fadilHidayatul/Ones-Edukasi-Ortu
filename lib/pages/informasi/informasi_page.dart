@@ -70,7 +70,7 @@ class _InformasiPageState extends State<InformasiPage> {
 
   _getfirstallinformasi() {
     var prov = Provider.of<InformasiProvider>(context, listen: false);
-    isloading = true;
+    setState(() => isloading = true);
     listkhususriwayat.clear();
     listkhususterbaru.clear();
     listumumriwayat.clear();
@@ -205,13 +205,11 @@ class _InformasiPageState extends State<InformasiPage> {
                             if (groupValue == 0) ...[
                               Expanded(
                                 child: (selectedFilter == "Terbaru")
-                                    ?
-
-                                    ///cek data kosong terbaru///
+                                    ? //cek data kosong terbaru//
                                     (listumumterbaru.isEmpty)
                                         ? NoDataWidget(
                                             message:
-                                                "Informasi Umum Terbaru Belum Adaa",
+                                                "Informasi Umum Terbaru Belum Ada",
                                           )
                                         : ListView.builder(
                                             shrinkWrap: true,
@@ -425,47 +423,179 @@ class _InformasiPageState extends State<InformasiPage> {
                                               );
                                             },
                                           )
-                                    :
-
-                                    ///cek data kosong riwayat///
+                                    : //cek data kosong riwayat//
                                     (listumumriwayat.isEmpty)
                                         ? NoDataWidget(
                                             message:
-                                                "Riwayat Informasi Umum Belum Ada")
-                                        : ListView.builder(
-                                            shrinkWrap: true,
-                                            itemCount: listumumriwayat.length,
-                                            itemBuilder: (context, index) {
-                                              return GestureDetector(
-                                                onTap: () {
-                                                  Provider.of<InformasiProvider>(
-                                                          context,
-                                                          listen: false)
-                                                      .getinformasibyid(
-                                                          listumumriwayat[index]
-                                                              .informasiid);
-                                                  AwesomeDialog(
-                                                      context: context,
-                                                      animType:
-                                                          AnimType.BOTTOMSLIDE,
-                                                      dialogType:
-                                                          DialogType.NO_HEADER,
-                                                      showCloseIcon: true,
-                                                      body: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
+                                                "Riwayat Informasi Umum Belum Ada",
+                                          )
+                                        : RefreshIndicator(
+                                            onRefresh: () async {
+                                              await Future.delayed(
+                                                Duration(seconds: 2),
+                                              );
+                                              await _getfirstallinformasi();
+                                            },
+                                            child: ListView.builder(
+                                              itemCount: listumumriwayat.length,
+                                              itemBuilder: (context, index) {
+                                                return GestureDetector(
+                                                  onTap: () {
+                                                    Provider.of<InformasiProvider>(
+                                                            context,
+                                                            listen: false)
+                                                        .getinformasibyid(
+                                                            listumumriwayat[
+                                                                    index]
+                                                                .informasiid);
+                                                    AwesomeDialog(
+                                                        context: context,
+                                                        animType: AnimType
+                                                            .BOTTOMSLIDE,
+                                                        dialogType: DialogType
+                                                            .NO_HEADER,
+                                                        showCloseIcon: true,
+                                                        body: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Row(
+                                                              mainAxisSize:
+                                                                  MainAxisSize
+                                                                      .max,
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceBetween,
+                                                              children: const [
+                                                                Text(
+                                                                  "Detail Informasi",
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          15,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            Container(
+                                                              width: double
+                                                                  .infinity,
+                                                              height: 0.2,
+                                                              color:
+                                                                  Colors.black,
+                                                              margin: EdgeInsets
+                                                                  .symmetric(
+                                                                      vertical:
+                                                                          5),
+                                                            ),
+                                                            Row(
+                                                              mainAxisSize:
+                                                                  MainAxisSize
+                                                                      .max,
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .end,
+                                                              children: [
+                                                                Text(DateFormat(
+                                                                        "d MMMM yyyy",
+                                                                        "ID_id")
+                                                                    .format(listumumriwayat[
+                                                                            index]
+                                                                        .tglmulai!))
+                                                              ],
+                                                            ),
+                                                            Container(
+                                                              margin: EdgeInsets
+                                                                  .all(4),
+                                                              child: Text(
+                                                                "${listumumriwayat[index].judul}",
+                                                                style: TextStyle(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold),
+                                                              ),
+                                                            ),
+                                                            Container(
+                                                                margin:
+                                                                    EdgeInsets
+                                                                        .all(4),
+                                                                child: Text(
+                                                                    "${listumumriwayat[index].deskripsi}")),
+                                                            Visibility(
+                                                                visible:
+                                                                    (listumumriwayat[index].pathDokumen ==
+                                                                            null)
+                                                                        ? false
+                                                                        : true,
+                                                                child: (listumumriwayat[index]
+                                                                            .pathDokumen
+                                                                            ?.split(
+                                                                                '.')
+                                                                            .last ==
+                                                                        "pdf")
+                                                                    ? Image.asset(
+                                                                        "assets/images/splash.png")
+                                                                    : CachedNetworkImage(
+                                                                        imageUrl:
+                                                                            "$urlimage${listumumriwayat[index].pathDokumen}",
+                                                                        placeholder:
+                                                                            (context, url) =>
+                                                                                CupertinoActivityIndicator(),
+                                                                        errorWidget: (context,
+                                                                                url,
+                                                                                error) =>
+                                                                            Row(
+                                                                          children: [
+                                                                            Icon(CupertinoIcons.nosign),
+                                                                            Text(
+                                                                              "Dokumen gagal ditampilkan",
+                                                                              style: TextStyle(fontSize: 10),
+                                                                            )
+                                                                          ],
+                                                                        ),
+                                                                      )),
+                                                            Container(
+                                                                margin:
+                                                                    EdgeInsets
+                                                                        .all(4),
+                                                                child: Text(
+                                                                  "Nama Penulis : ${listumumriwayat[index].jabatan}",
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          12,
+                                                                      color: Colors
+                                                                          .black45),
+                                                                ))
+                                                          ],
+                                                        )).show();
+                                                  },
+                                                  child: Card(
+                                                    color: Colors.white,
+                                                    elevation: 1,
+                                                    margin: EdgeInsets.all(10),
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        12)),
+                                                    child: Padding(
+                                                      padding: const EdgeInsets
+                                                              .symmetric(
+                                                          horizontal: 12,
+                                                          vertical: 6),
+                                                      child: Row(
                                                         children: [
-                                                          Row(
-                                                            mainAxisSize:
-                                                                MainAxisSize
-                                                                    .max,
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .spaceBetween,
-                                                            children: const [
+                                                          Expanded(
+                                                              child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
                                                               Text(
-                                                                "Detail Informasi",
+                                                                "${listumumriwayat[index].judul}",
                                                                 style: TextStyle(
                                                                     fontSize:
                                                                         15,
@@ -473,173 +603,48 @@ class _InformasiPageState extends State<InformasiPage> {
                                                                         FontWeight
                                                                             .bold),
                                                               ),
-                                                            ],
-                                                          ),
-                                                          Container(
-                                                            width:
-                                                                double.infinity,
-                                                            height: 0.2,
-                                                            color: Colors.black,
-                                                            margin: EdgeInsets
-                                                                .symmetric(
+                                                              Padding(
+                                                                padding: const EdgeInsets
+                                                                        .symmetric(
                                                                     vertical:
-                                                                        5),
-                                                          ),
-                                                          Row(
-                                                            mainAxisSize:
-                                                                MainAxisSize
-                                                                    .max,
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .end,
-                                                            children: [
-                                                              Text(DateFormat(
-                                                                      "d MMMM yyyy",
-                                                                      "ID_id")
-                                                                  .format(listumumriwayat[
-                                                                          index]
-                                                                      .tglmulai!))
-                                                            ],
-                                                          ),
-                                                          Container(
-                                                            margin:
-                                                                EdgeInsets.all(
-                                                                    4),
-                                                            child: Text(
-                                                              "${listumumriwayat[index].judul}",
-                                                              style: TextStyle(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold),
-                                                            ),
-                                                          ),
-                                                          Container(
-                                                              margin: EdgeInsets
-                                                                  .all(4),
-                                                              child: Text(
-                                                                  "${listumumriwayat[index].deskripsi}")),
-                                                          Visibility(
-                                                              visible: (listumumriwayat[
+                                                                        3),
+                                                                child: Text(
+                                                                  DateFormat(
+                                                                          "d MMMM yyyy",
+                                                                          "ID_id")
+                                                                      .format(listumumriwayat[
                                                                               index]
-                                                                          .pathDokumen ==
-                                                                      null)
-                                                                  ? false
-                                                                  : true,
-                                                              child: (listumumriwayat[
-                                                                              index]
-                                                                          .pathDokumen
-                                                                          ?.split(
-                                                                              '.')
-                                                                          .last ==
-                                                                      "pdf")
-                                                                  ? Image.asset(
-                                                                      "assets/images/splash.png")
-                                                                  : CachedNetworkImage(
-                                                                      imageUrl:
-                                                                          "$urlimage${listumumriwayat[index].pathDokumen}",
-                                                                      placeholder:
-                                                                          (context, url) =>
-                                                                              CupertinoActivityIndicator(),
-                                                                      errorWidget: (context,
-                                                                              url,
-                                                                              error) =>
-                                                                          Row(
-                                                                        children: [
-                                                                          Icon(CupertinoIcons
-                                                                              .nosign),
-                                                                          Text(
-                                                                            "Dokumen gagal ditampilkan",
-                                                                            style:
-                                                                                TextStyle(fontSize: 10),
-                                                                          )
-                                                                        ],
-                                                                      ),
-                                                                    )),
-                                                          Container(
-                                                              margin: EdgeInsets
-                                                                  .all(4),
-                                                              child: Text(
-                                                                "Nama Penulis : ${listumumriwayat[index].jabatan}",
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        12,
-                                                                    color: Colors
-                                                                        .black45),
-                                                              ))
-                                                        ],
-                                                      )).show();
-                                                },
-                                                child: Card(
-                                                  color: Colors.white,
-                                                  elevation: 1,
-                                                  margin: EdgeInsets.all(10),
-                                                  shape: RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              12)),
-                                                  child: Padding(
-                                                    padding: const EdgeInsets
-                                                            .symmetric(
-                                                        horizontal: 12,
-                                                        vertical: 6),
-                                                    child: Row(
-                                                      children: [
-                                                        Expanded(
-                                                            child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            Text(
-                                                              "${listumumriwayat[index].judul}",
-                                                              style: TextStyle(
-                                                                  fontSize: 15,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold),
-                                                            ),
-                                                            Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                          .symmetric(
-                                                                      vertical:
-                                                                          3),
-                                                              child: Text(
-                                                                DateFormat(
-                                                                        "d MMMM yyyy",
-                                                                        "ID_id")
-                                                                    .format(listumumriwayat[
-                                                                            index]
-                                                                        .tglmulai!),
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        12),
+                                                                          .tglmulai!),
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          12),
+                                                                ),
                                                               ),
-                                                            ),
-                                                            Text(
-                                                                "Post Oleh :${listumumriwayat[index].jabatan}",
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        12)),
-                                                          ],
-                                                        )),
-                                                        Icon(
-                                                          CupertinoIcons
-                                                              .checkmark_alt,
-                                                          color: (listumumriwayat[
-                                                                          index]
-                                                                      .pembeda ==
-                                                                  "R")
-                                                              ? Color(
-                                                                  0xFFFF8C00)
-                                                              : Colors.grey,
-                                                        )
-                                                      ],
+                                                              Text(
+                                                                  "Post Oleh :${listumumriwayat[index].jabatan}",
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          12)),
+                                                            ],
+                                                          )),
+                                                          Icon(
+                                                            CupertinoIcons
+                                                                .checkmark_alt,
+                                                            color: (listumumriwayat[
+                                                                            index]
+                                                                        .pembeda ==
+                                                                    "R")
+                                                                ? Color(
+                                                                    0xFFFF8C00)
+                                                                : Colors.grey,
+                                                          )
+                                                        ],
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
-                                              );
-                                            },
+                                                );
+                                              },
+                                            ),
                                           ),
                               )
 
@@ -867,248 +872,254 @@ class _InformasiPageState extends State<InformasiPage> {
                                     : (listkhususriwayat.isEmpty)
                                         ? NoDataWidget(
                                             message:
-                                                "Riwayat Informasi Khusus Belum Ada")
-                                        : ListView.builder(
-                                            itemCount: listkhususriwayat.length,
-                                            shrinkWrap: true,
-                                            itemBuilder: (context, index) {
-                                              return GestureDetector(
-                                                onTap: () {
-                                                  Provider.of<InformasiProvider>(
-                                                          context,
-                                                          listen: false)
-                                                      .getinformasibyid(
-                                                          listkhususriwayat[
-                                                                  index]
-                                                              .informasiid);
-                                                  AwesomeDialog(
-                                                      context: context,
-                                                      animType:
-                                                          AnimType.BOTTOMSLIDE,
-                                                      dialogType:
-                                                          DialogType.NO_HEADER,
-                                                      showCloseIcon: true,
-                                                      body: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Row(
-                                                            mainAxisSize:
-                                                                MainAxisSize
-                                                                    .max,
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .spaceBetween,
-                                                            children: const [
-                                                              Text(
-                                                                "Detail Informasi",
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        15,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          Container(
-                                                            width:
-                                                                double.infinity,
-                                                            height: 0.2,
-                                                            color: Colors.black,
-                                                            margin: EdgeInsets
-                                                                .symmetric(
-                                                                    vertical:
-                                                                        5),
-                                                          ),
-                                                          Row(
-                                                            mainAxisSize:
-                                                                MainAxisSize
-                                                                    .max,
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .end,
-                                                            children: [
-                                                              Text(DateFormat(
-                                                                      "d MMMM yyyy",
-                                                                      "ID_id")
-                                                                  .format(listkhususriwayat[
-                                                                          index]
-                                                                      .tglmulai!))
-                                                            ],
-                                                          ),
-                                                          Container(
-                                                            margin:
-                                                                EdgeInsets.all(
-                                                                    4),
-                                                            child: Text(
-                                                              "${listkhususriwayat[index].judul}",
-                                                              style: TextStyle(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold),
-                                                            ),
-                                                          ),
-                                                          Container(
-                                                              margin: EdgeInsets
-                                                                  .all(4),
-                                                              child: Text(
-                                                                  "${listkhususriwayat[index].deskripsi}")),
-                                                          Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(12.0),
-                                                            child: Visibility(
-                                                              visible: (listkhususriwayat[
-                                                                              index]
-                                                                          .pathDokumen ==
-                                                                      null)
-                                                                  ? false
-                                                                  : true,
-                                                              child: (listkhususriwayat[
-                                                                              index]
-                                                                          .pathDokumen
-                                                                          ?.split(
-                                                                              '.')
-                                                                          .last ==
-                                                                      "pdf")
-                                                                  ? TextButton(
-                                                                      onPressed:
-                                                                          () {
-                                                                        // Provider.of<InformasiProvider>(
-                                                                        //         context,
-                                                                        //         listen:
-                                                                        //             false)
-                                                                        //     .getfilepdf(
-                                                                        //         "$urlimage${listkhususriwayat[index].pathDokumen}",
-                                                                        //         index).then((value){
-                                                                        //           if (value!=null) {
-                                                                        //             Navigator.push(context, MaterialPageRoute(builder: (context) {
-                                                                        //               return InformasiPdfDetail(path: value.path,title: listkhususriwayat[index].judul,);
-                                                                        //             },));
-                                                                        //           }
-                                                                        //         });
-                                                                      },
-                                                                      child:
-                                                                          Text(
-                                                                        "Lihat file PDF",
-                                                                        style: TextStyle(
-                                                                            fontSize:
-                                                                                14,
-                                                                            fontWeight:
-                                                                                FontWeight.bold,
-                                                                            color: Color(0xFFFF8C00)),
-                                                                      ))
-                                                                  : CachedNetworkImage(
-                                                                      imageUrl:
-                                                                          "$urlimage${listkhususriwayat[index].pathDokumen}",
-                                                                      placeholder:
-                                                                          (context, url) =>
-                                                                              CupertinoActivityIndicator(),
-                                                                      errorWidget: (context,
-                                                                              url,
-                                                                              error) =>
-                                                                          Row(
-                                                                        children: [
-                                                                          Icon(CupertinoIcons
-                                                                              .nosign),
-                                                                          Text(
-                                                                            "Dokumen gagal ditampilkan",
-                                                                            style:
-                                                                                TextStyle(fontSize: 10),
-                                                                          )
-                                                                        ],
-                                                                      ),
-                                                                    ),
-                                                            ),
-                                                          ),
-                                                          Container(
-                                                              margin: EdgeInsets
-                                                                  .all(4),
-                                                              child: Text(
-                                                                "Nama Penulis : ${listkhususriwayat[index].jabatan}",
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        12,
-                                                                    color: Colors
-                                                                        .black45),
-                                                              ))
-                                                        ],
-                                                      )).show();
-                                                },
-                                                child: Card(
-                                                  color: Colors.white,
-                                                  elevation: 1,
-                                                  margin: EdgeInsets.all(10),
-                                                  shape: RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              12)),
-                                                  child: Padding(
-                                                    padding: const EdgeInsets
-                                                            .symmetric(
-                                                        horizontal: 12,
-                                                        vertical: 6),
-                                                    child: Row(
-                                                      children: [
-                                                        Expanded(
-                                                            child: Column(
+                                                "Riwayat Informasi Khusus Belum Ada",
+                                          )
+                                        : RefreshIndicator(
+                                          onRefresh: () async {
+                                            await Future.delayed(Duration(seconds: 2));
+                                            await _getfirstallinformasi();
+                                          },
+                                          child: ListView.builder(
+                                              itemCount: listkhususriwayat.length,
+                                              itemBuilder: (context, index) {
+                                                return GestureDetector(
+                                                  onTap: () {
+                                                    Provider.of<InformasiProvider>(
+                                                            context,
+                                                            listen: false)
+                                                        .getinformasibyid(
+                                                            listkhususriwayat[
+                                                                    index]
+                                                                .informasiid);
+                                                    AwesomeDialog(
+                                                        context: context,
+                                                        animType:
+                                                            AnimType.BOTTOMSLIDE,
+                                                        dialogType:
+                                                            DialogType.NO_HEADER,
+                                                        showCloseIcon: true,
+                                                        body: Column(
                                                           crossAxisAlignment:
                                                               CrossAxisAlignment
                                                                   .start,
                                                           children: [
-                                                            Text(
-                                                              "${listkhususriwayat[index].judul}",
-                                                              style: TextStyle(
-                                                                  fontSize: 15,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold),
+                                                            Row(
+                                                              mainAxisSize:
+                                                                  MainAxisSize
+                                                                      .max,
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceBetween,
+                                                              children: const [
+                                                                Text(
+                                                                  "Detail Informasi",
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          15,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold),
+                                                                ),
+                                                              ],
                                                             ),
-                                                            Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                          .symmetric(
+                                                            Container(
+                                                              width:
+                                                                  double.infinity,
+                                                              height: 0.2,
+                                                              color: Colors.black,
+                                                              margin: EdgeInsets
+                                                                  .symmetric(
                                                                       vertical:
-                                                                          3),
-                                                              child: Text(
-                                                                DateFormat(
+                                                                          5),
+                                                            ),
+                                                            Row(
+                                                              mainAxisSize:
+                                                                  MainAxisSize
+                                                                      .max,
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .end,
+                                                              children: [
+                                                                Text(DateFormat(
                                                                         "d MMMM yyyy",
                                                                         "ID_id")
                                                                     .format(listkhususriwayat[
                                                                             index]
-                                                                        .tglmulai!),
+                                                                        .tglmulai!))
+                                                              ],
+                                                            ),
+                                                            Container(
+                                                              margin:
+                                                                  EdgeInsets.all(
+                                                                      4),
+                                                              child: Text(
+                                                                "${listkhususriwayat[index].judul}",
                                                                 style: TextStyle(
-                                                                    fontSize:
-                                                                        12),
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold),
                                                               ),
                                                             ),
-                                                            Text(
-                                                                "Post oleh : ${listkhususriwayat[index].jabatan}",
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        12)),
+                                                            Container(
+                                                                margin: EdgeInsets
+                                                                    .all(4),
+                                                                child: Text(
+                                                                    "${listkhususriwayat[index].deskripsi}")),
+                                                            Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .all(12.0),
+                                                              child: Visibility(
+                                                                visible: (listkhususriwayat[
+                                                                                index]
+                                                                            .pathDokumen ==
+                                                                        null)
+                                                                    ? false
+                                                                    : true,
+                                                                child: (listkhususriwayat[
+                                                                                index]
+                                                                            .pathDokumen
+                                                                            ?.split(
+                                                                                '.')
+                                                                            .last ==
+                                                                        "pdf")
+                                                                    ? TextButton(
+                                                                        onPressed:
+                                                                            () {
+                                                                          // Provider.of<InformasiProvider>(
+                                                                          //         context,
+                                                                          //         listen:
+                                                                          //             false)
+                                                                          //     .getfilepdf(
+                                                                          //         "$urlimage${listkhususriwayat[index].pathDokumen}",
+                                                                          //         index).then((value){
+                                                                          //           if (value!=null) {
+                                                                          //             Navigator.push(context, MaterialPageRoute(builder: (context) {
+                                                                          //               return InformasiPdfDetail(path: value.path,title: listkhususriwayat[index].judul,);
+                                                                          //             },));
+                                                                          //           }
+                                                                          //         });
+                                                                        },
+                                                                        child:
+                                                                            Text(
+                                                                          "Lihat file PDF",
+                                                                          style: TextStyle(
+                                                                              fontSize:
+                                                                                  14,
+                                                                              fontWeight:
+                                                                                  FontWeight.bold,
+                                                                              color: Color(0xFFFF8C00)),
+                                                                        ))
+                                                                    : CachedNetworkImage(
+                                                                        imageUrl:
+                                                                            "$urlimage${listkhususriwayat[index].pathDokumen}",
+                                                                        placeholder:
+                                                                            (context, url) =>
+                                                                                CupertinoActivityIndicator(),
+                                                                        errorWidget: (context,
+                                                                                url,
+                                                                                error) =>
+                                                                            Row(
+                                                                          children: [
+                                                                            Icon(CupertinoIcons
+                                                                                .nosign),
+                                                                            Text(
+                                                                              "Dokumen gagal ditampilkan",
+                                                                              style:
+                                                                                  TextStyle(fontSize: 10),
+                                                                            )
+                                                                          ],
+                                                                        ),
+                                                                      ),
+                                                              ),
+                                                            ),
+                                                            Container(
+                                                                margin: EdgeInsets
+                                                                    .all(4),
+                                                                child: Text(
+                                                                  "Nama Penulis : ${listkhususriwayat[index].jabatan}",
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          12,
+                                                                      color: Colors
+                                                                          .black45),
+                                                                ))
                                                           ],
-                                                        )),
-                                                        Icon(
-                                                          CupertinoIcons
-                                                              .checkmark_alt,
-                                                          color: (listkhususriwayat[
-                                                                          index]
-                                                                      .pembeda ==
-                                                                  "R")
-                                                              ? Color(
-                                                                  0xFFFF8C00)
-                                                              : Colors.grey,
-                                                        )
-                                                      ],
+                                                        )).show();
+                                                  },
+                                                  child: Card(
+                                                    color: Colors.white,
+                                                    elevation: 1,
+                                                    margin: EdgeInsets.all(10),
+                                                    shape: RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                                12)),
+                                                    child: Padding(
+                                                      padding: const EdgeInsets
+                                                              .symmetric(
+                                                          horizontal: 12,
+                                                          vertical: 6),
+                                                      child: Row(
+                                                        children: [
+                                                          Expanded(
+                                                              child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              Text(
+                                                                "${listkhususriwayat[index].judul}",
+                                                                style: TextStyle(
+                                                                    fontSize: 15,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold),
+                                                              ),
+                                                              Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                            .symmetric(
+                                                                        vertical:
+                                                                            3),
+                                                                child: Text(
+                                                                  DateFormat(
+                                                                          "d MMMM yyyy",
+                                                                          "ID_id")
+                                                                      .format(listkhususriwayat[
+                                                                              index]
+                                                                          .tglmulai!),
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          12),
+                                                                ),
+                                                              ),
+                                                              Text(
+                                                                  "Post oleh : ${listkhususriwayat[index].jabatan}",
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          12)),
+                                                            ],
+                                                          )),
+                                                          Icon(
+                                                            CupertinoIcons
+                                                                .checkmark_alt,
+                                                            color: (listkhususriwayat[
+                                                                            index]
+                                                                        .pembeda ==
+                                                                    "R")
+                                                                ? Color(
+                                                                    0xFFFF8C00)
+                                                                : Colors.grey,
+                                                          )
+                                                        ],
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
-                                              );
-                                            },
-                                          ),
+                                                );
+                                              },
+                                            ),
+                                        ),
                               )
                             ]
                           ],

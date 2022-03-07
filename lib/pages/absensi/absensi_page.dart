@@ -123,7 +123,7 @@ class _AbsensiPageState extends State<AbsensiPage> {
     if (page < lastpage) {
       prov.loadMoreAbsensiHarian(page + 1).then((value) {
         var newData = prov.listabsensiharian[page].data;
-  
+
         for (var element in newData!) {
           dayList.add(element);
         }
@@ -281,8 +281,13 @@ class _AbsensiPageState extends State<AbsensiPage> {
                                                     ),
                                                     ////listview builder harian
                                                     Expanded(
-                                                        child: SizedBox(
-                                                      width: double.infinity,
+                                                        child: RefreshIndicator(
+                                                      onRefresh: () async {
+                                                        await Future.delayed(
+                                                            Duration(
+                                                                seconds: 2));
+                                                        await _getfirstlist();
+                                                      },
                                                       child: ListView.builder(
                                                         controller:
                                                             _scrollController,
@@ -480,86 +485,98 @@ class _AbsensiPageState extends State<AbsensiPage> {
                                                           ),
                                                           ////listview builder bulanan
                                                           Expanded(
-                                                            child: ListView
-                                                                .builder(
-                                                              itemCount:
-                                                                  data!.length,
-                                                              itemBuilder:
-                                                                  (context,
-                                                                      index) {
-                                                                return Padding(
-                                                                  padding: const EdgeInsets
-                                                                          .symmetric(
-                                                                      horizontal:
-                                                                          8,
-                                                                      vertical:
-                                                                          4),
-                                                                  child: Card(
-                                                                    elevation:
-                                                                        2,
-                                                                    color: Colors
-                                                                        .white,
-                                                                    shape: RoundedRectangleBorder(
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(10)),
-                                                                    child:
-                                                                        Padding(
-                                                                      padding: const EdgeInsets
-                                                                              .symmetric(
-                                                                          vertical:
-                                                                              15,
-                                                                          horizontal:
-                                                                              15),
+                                                            child:
+                                                                RefreshIndicator(
+                                                              onRefresh:
+                                                                  () async {
+                                                                await Future.delayed(
+                                                                    Duration(
+                                                                        seconds:
+                                                                            2));
+                                                                await _getfirstlist();
+                                                              },
+                                                              child: ListView
+                                                                  .builder(
+                                                                shrinkWrap:
+                                                                    true,
+                                                                itemCount: data!
+                                                                    .length,
+                                                                itemBuilder:
+                                                                    (context,
+                                                                        index) {
+                                                                  return Padding(
+                                                                    padding: const EdgeInsets
+                                                                            .symmetric(
+                                                                        horizontal:
+                                                                            8,
+                                                                        vertical:
+                                                                            4),
+                                                                    child: Card(
+                                                                      elevation:
+                                                                          2,
+                                                                      color: Colors
+                                                                          .white,
+                                                                      shape: RoundedRectangleBorder(
+                                                                          borderRadius:
+                                                                              BorderRadius.circular(10)),
                                                                       child:
-                                                                          Row(
-                                                                        children: [
-                                                                          Flexible(
-                                                                              flex: 3,
-                                                                              child: SizedBox(
-                                                                                width: double.infinity,
-                                                                                child: Text(
-                                                                                  DateFormat("MMMM", "ID_id").format(
-                                                                                    DateTime(0, data[bulanKe[index]]!.bulan ?? 0),
+                                                                          Padding(
+                                                                        padding: const EdgeInsets.symmetric(
+                                                                            vertical:
+                                                                                15,
+                                                                            horizontal:
+                                                                                15),
+                                                                        child:
+                                                                            Row(
+                                                                          children: [
+                                                                            Flexible(
+                                                                                flex: 3,
+                                                                                child: SizedBox(
+                                                                                  width: double.infinity,
+                                                                                  child: Text(
+                                                                                    DateFormat("MMMM", "ID_id").format(
+                                                                                      DateTime(0, data[bulanKe[index]]!.bulan ?? 0),
+                                                                                    ),
+                                                                                    // "${ bulan}",
                                                                                   ),
-                                                                                  // "${ bulan}",
-                                                                                ),
-                                                                              )),
-                                                                          Flexible(
-                                                                              flex: 1,
-                                                                              child: SizedBox(
-                                                                                width: double.infinity,
-                                                                                child: Text(
-                                                                                  "${data[bulanKe[index]]!.hadir}",
-                                                                                  textAlign: TextAlign.center,
-                                                                                  style: TextStyle(color: Color(0xFF0066FF)),
-                                                                                ),
-                                                                              )),
-                                                                          Flexible(
-                                                                              flex: 1,
-                                                                              child: SizedBox(
-                                                                                width: double.infinity,
-                                                                                child: Text(
-                                                                                  "${data[bulanKe[index]]!.izin}",
-                                                                                  textAlign: TextAlign.center,
-                                                                                  style: TextStyle(color: Color(0xFFFFB800)),
-                                                                                ),
-                                                                              )),
-                                                                          Flexible(
-                                                                              flex: 1,
-                                                                              child: SizedBox(
-                                                                                width: double.infinity,
-                                                                                child: Text(
-                                                                                  "${data[bulanKe[index]]!.cabut}",
-                                                                                  textAlign: TextAlign.center,
-                                                                                  style: TextStyle(color: Color(0xFFEF5350)),
-                                                                                ),
-                                                                              )),
-                                                                        ],
+                                                                                )),
+                                                                            Flexible(
+                                                                                flex: 1,
+                                                                                child: SizedBox(
+                                                                                  width: double.infinity,
+                                                                                  child: Text(
+                                                                                    "${data[bulanKe[index]]!.hadir}",
+                                                                                    textAlign: TextAlign.center,
+                                                                                    style: TextStyle(color: Color(0xFF0066FF)),
+                                                                                  ),
+                                                                                )),
+                                                                            Flexible(
+                                                                                flex: 1,
+                                                                                child: SizedBox(
+                                                                                  width: double.infinity,
+                                                                                  child: Text(
+                                                                                    "${data[bulanKe[index]]!.izin}",
+                                                                                    textAlign: TextAlign.center,
+                                                                                    style: TextStyle(color: Color(0xFFFFB800)),
+                                                                                  ),
+                                                                                )),
+                                                                            Flexible(
+                                                                                flex: 1,
+                                                                                child: SizedBox(
+                                                                                  width: double.infinity,
+                                                                                  child: Text(
+                                                                                    "${data[bulanKe[index]]!.cabut}",
+                                                                                    textAlign: TextAlign.center,
+                                                                                    style: TextStyle(color: Color(0xFFEF5350)),
+                                                                                  ),
+                                                                                )),
+                                                                          ],
+                                                                        ),
                                                                       ),
                                                                     ),
-                                                                  ),
-                                                                );
-                                                              },
+                                                                  );
+                                                                },
+                                                              ),
                                                             ),
                                                           )
                                                         ],
