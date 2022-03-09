@@ -92,6 +92,7 @@ class _SplashScreenState extends State<SplashScreen> {
                       height: 145,
                     ),
                   ),
+                  //bagian ini mungkin dihilangkan
                   Align(
                     alignment: Alignment(0, -0.5),
                     child: Text(
