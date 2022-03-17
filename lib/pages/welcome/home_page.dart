@@ -14,6 +14,7 @@ import 'package:edu_ready/pages/pembayaran/pembayaran_page.dart';
 import 'package:edu_ready/pages/saldo/history_saldo_page.dart';
 import 'package:edu_ready/pages/saldo/top_up_page.dart';
 import 'package:edu_ready/pages/welcome/login_page.dart';
+import 'package:edu_ready/providers/auth_provider.dart';
 import 'package:edu_ready/providers/dashboard_provider.dart';
 import 'package:edu_ready/utils/currency.dart';
 import 'package:edu_ready/widgets/data_siswa_popup.dart';
@@ -147,7 +148,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     DateTime preBackspace = DateTime.now();
-    
+
     return WillPopScope(
       onWillPop: () async {
         final timegap = DateTime.now().difference(preBackspace);
@@ -155,7 +156,8 @@ class _HomePageState extends State<HomePage> {
 
         preBackspace = DateTime.now();
         if (cantExit) {
-          Fluttertoast.showToast(msg: "Tekan lagi untuk keluar",toastLength: Toast.LENGTH_SHORT);
+          Fluttertoast.showToast(
+              msg: "Tekan lagi untuk keluar", toastLength: Toast.LENGTH_SHORT);
           return false;
         } else {
           return true;
@@ -202,17 +204,24 @@ class _HomePageState extends State<HomePage> {
                                   CupertinoButton(
                                       child: Text("Yes"),
                                       onPressed: () async {
+                                        // Navigator.pushNamedAndRemoveUntil(context, LoginPage.pageRoute, ModalRoute.withName(LoginPage.pageRoute));
+                                        Navigator.pushAndRemoveUntil(context, CupertinoPageRoute(builder: (context) => LoginPage(),), ModalRoute.withName(LoginPage.pageRoute));
+
                                         SharedPreferences pref =
                                             await SharedPreferences
                                                 .getInstance();
                                         pref.clear();
-                                        Provider.of<DashboardProvider>(context,
-                                                listen: false)
-                                            .getDashboard
-                                            .clear();
 
-                                        Navigator.pushReplacementNamed(
-                                            context, LoginPage.pageRoute);
+                                        Provider.of<DashboardProvider>(
+                                          context,
+                                          listen: false,
+                                        ).getDashboard.clear();
+
+                                        //auto login jadi off
+                                        Provider.of<AuthProvider>(context,
+                                                    listen: false)
+                                                .haveLogged() ==
+                                            Future<bool>.value(false);
                                       }),
                                 ],
                               );

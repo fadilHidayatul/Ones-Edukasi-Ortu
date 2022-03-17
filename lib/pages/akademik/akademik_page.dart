@@ -90,6 +90,7 @@ class _AkademikPageState extends State<AkademikPage> {
     dataakakhusus.clear();
 
     prov.getfirstakademikumum().then((value) {
+      if (!mounted) return;
       setState(() {
         lastpage = prov.lastpage;
       });
@@ -135,7 +136,7 @@ class _AkademikPageState extends State<AkademikPage> {
     for (var i = 2; i <= lastpage; i++) {
       prov.getmoreakademikumum(i).then((value) {
         page++;
-        
+
         for (var element in prov.listakaumum[page].data!) {
           dataakaumum.add(element);
         }
@@ -172,7 +173,7 @@ class _AkademikPageState extends State<AkademikPage> {
 
         pagekhusus++;
 
-        if(!mounted)return;
+        if (!mounted) return;
         setState(() {});
       }).catchError((onError) {
         // print("gagal menambahkan page ke ${pagekhusus + 2}");
@@ -186,7 +187,7 @@ class _AkademikPageState extends State<AkademikPage> {
     if (args != null) {
       setState(() => groupvalue = args as int);
     }
-
+    
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size(double.infinity, AppBar().preferredSize.height),
@@ -355,7 +356,9 @@ class _AkademikPageState extends State<AkademikPage> {
                                   children: [
                                     Padding(
                                       padding: const EdgeInsets.symmetric(
-                                          vertical: 8, horizontal: 12),
+                                        vertical: 8,
+                                        horizontal: 12,
+                                      ),
                                       child: Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
@@ -467,8 +470,7 @@ class _AkademikPageState extends State<AkademikPage> {
                                   ],
                                 ),
                               )
-                            : 
-                            Expanded(
+                            : Expanded(
                                 child: Card(
                                   color: Colors.white,
                                   elevation: 1,

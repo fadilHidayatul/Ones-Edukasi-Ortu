@@ -43,7 +43,8 @@ class _LoginPageState extends State<LoginPage> {
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 Image(
-                                  image: AssetImage("assets/images/splash.png"),
+                                  image:
+                                      AssetImage("assets/images/one_text.png"),
                                   width: 150,
                                   height: 150,
                                 ),
@@ -172,10 +173,18 @@ class _LoginPageState extends State<LoginPage> {
                                                 .loginUser(txtUsername.text,
                                                     txtPassword.text)
                                                 .then(
-                                                  (value) => Navigator
-                                                      .pushReplacement(context, CupertinoPageRoute(builder: (context) {
-                                                        return HomePage();
-                                                      },))
+                                                  (value) =>
+                                                  //     Navigator.pushReplacement(
+                                                  //   context,
+                                                  //   CupertinoPageRoute(
+                                                  //     builder: (context) {
+                                                  //       return HomePage();
+                                                  //     },
+                                                  //   ),
+                                                  // ),
+                                                  // Navigator.pushNamedAndRemoveUntil(context, HomePage.pageRoute, ModalRoute.withName(HomePage.pageRoute))
+                                                  Navigator.pushAndRemoveUntil(context, CupertinoPageRoute(builder: (context) => HomePage(),), ModalRoute.withName(HomePage.pageRoute))
+
                                                 )
                                                 .catchError((onerror) {
                                               ScaffoldMessenger.of(context)
@@ -191,13 +200,6 @@ class _LoginPageState extends State<LoginPage> {
                                           color: Color(0xFFFFA726),
                                           borderRadius:
                                               BorderRadius.circular(15),
-                                          // style: ElevatedButton.styleFrom(
-                                          //   shape: RoundedRectangleBorder(
-                                          //     borderRadius: BorderRadius.circular(16)
-                                          //   ),
-                                          //     padding: EdgeInsets.symmetric(
-                                          //         horizontal: 60,
-                                          //         vertical: 18)),
                                         )),
                                     Align(
                                       alignment: Alignment.center,

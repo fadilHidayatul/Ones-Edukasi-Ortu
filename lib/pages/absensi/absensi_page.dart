@@ -140,6 +140,12 @@ class _AbsensiPageState extends State<AbsensiPage> {
 
   @override
   Widget build(BuildContext context) {
+    //pertama kali build set filter jadi fix harian
+    if (mounted) {
+      setState(() {
+        isharian = true;
+      });
+    }
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size(double.infinity, AppBar().preferredSize.height),

@@ -24,23 +24,27 @@ class _SplashScreenState extends State<SplashScreen> {
         await Provider.of<AuthProvider>(context, listen: false).haveLogged();
 
     if (authData) {
-      Navigator.pushReplacement(
-        context,
-        CupertinoPageRoute(
-          builder: (context) {
-            return HomePage();
-          },
-        ),
-      );
+      // Navigator.pushReplacement(
+      //   context,
+      //   CupertinoPageRoute(
+      //     builder: (context) {
+      //       return HomePage();
+      //     },
+      //   ),
+      // );
+      // Navigator.pushNamedAndRemoveUntil(context, HomePage.pageRoute, ModalRoute.withName(HomePage.pageRoute));
+      Navigator.pushAndRemoveUntil(context, CupertinoPageRoute(builder: (context) => HomePage(),), ModalRoute.withName(HomePage.pageRoute));
     } else {
-      Navigator.pushReplacement(
-        context,
-        CupertinoPageRoute(
-          builder: (context) {
-            return LoginPage();
-          },
-        ),
-      );
+      // Navigator.pushReplacement(
+      //   context,
+      //   CupertinoPageRoute(
+      //     builder: (context) {
+      //       return LoginPage();
+      //     },
+      //   ),
+      // );
+      // Navigator.pushNamedAndRemoveUntil(context, LoginPage.pageRoute, ModalRoute.withName(LoginPage.pageRoute));
+      Navigator.pushAndRemoveUntil(context, CupertinoPageRoute(builder: (context) => LoginPage(),), ModalRoute.withName(LoginPage.pageRoute));
     }
   }
 
