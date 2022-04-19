@@ -24,9 +24,9 @@ class Dashboard {
     this.totalkhusus,
   });
 
-  List<Absensi>? absensi;
-  List<BDepanSekarang>? bDepanSekarang;
-  String? saldo;
+  List<Absensi>? absensi = [];
+  List<BDepanSekarang>? bDepanSekarang = [];
+  int? saldo;
   List<NilaiDashboard>? nilaiDashboard;
   List<NilaiDashboardGrafik>? nilaiDashboardGrafik;
   List<Showtanggungan>? showtanggungan;
@@ -196,26 +196,26 @@ class NilaiDashboard {
   });
 
   int idsiswa;
-  Tahunajaran? tahunajaran;
+  String? tahunajaran;
   int tipesemester;
   String nama;
   String namapel;
   String realnamapel;
   DateTime tanggal;
-  Tipe? tipe;
+  String? tipe;
   int nilainya;
   int idmpel;
   int idguru;
 
   factory NilaiDashboard.fromJson(Map<String, dynamic> json) => NilaiDashboard(
         idsiswa: json["idsiswa"],
-        tahunajaran: tahunajaranValues.map[json["tahunajaran"]],
+        tahunajaran: json["tahunajaran"],
         tipesemester: json["tipesemester"],
         nama: json["nama"],
         namapel: json["namapel"],
         realnamapel: json["realnamapel"],
         tanggal: DateTime.parse(json["tanggal"]),
-        tipe: tipeValues.map[json["tipe"]],
+        tipe: json["tipe"],
         nilainya: json["nilainya"],
         idmpel: json["idmpel"],
         idguru: json["idguru"],
@@ -223,14 +223,14 @@ class NilaiDashboard {
 
   Map<String, dynamic> toJson() => {
         "idsiswa": idsiswa,
-        "tahunajaran": tahunajaranValues.reverse[tahunajaran],
+        "tahunajaran": tahunajaran,
         "tipesemester": tipesemester,
         "nama": nama,
         "namapel": namapel,
         "realnamapel": realnamapel,
         "tanggal":
             "${tanggal.year.toString().padLeft(4, '0')}-${tanggal.month.toString().padLeft(2, '0')}-${tanggal.day.toString().padLeft(2, '0')}",
-        "tipe": tipeValues.reverse[tipe],
+        "tipe": tipe,
         "nilainya": nilainya,
         "idmpel": idmpel,
         "idguru": idguru,
@@ -284,15 +284,6 @@ class NilaiDashboardGrafik {
         "tahunajaran": tahunajaran,
     };
 }
-
-enum Tahunajaran { THE_20212022 }
-
-final tahunajaranValues = EnumValues({"2021/2022": Tahunajaran.THE_20212022});
-
-enum Tipe { UH, MID, UAS }
-
-final tipeValues =
-    EnumValues({"MID": Tipe.MID, "UAS": Tipe.UAS, "ULANGAN HARIAN": Tipe.UH});
 
 class Showtanggungan {
   Showtanggungan({

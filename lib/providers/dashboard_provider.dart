@@ -40,8 +40,7 @@ class DashboardProvider with ChangeNotifier {
         notifyListeners();
         // print(getDashboard[0].absensi[1].namaguru);
       } else {
-        // print(json.decode(response.body));
-        throw (json.decode(response.body)["message"]);
+        throw(json.decode(response.body)["message"]);
       }
     } catch (e) {
       rethrow;
