@@ -213,10 +213,12 @@ class _AbsensiPageState extends State<AbsensiPage> {
                                     if (value == "Bulanan") {
                                       setState(() {
                                         isharian = false;
+                                        print(value);
                                       });
                                     } else if (value == "Harian") {
                                       setState(() {
                                         isharian = true;
+                                        print(value);
                                       });
                                     }
                                   },

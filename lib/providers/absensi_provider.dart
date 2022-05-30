@@ -1,9 +1,8 @@
 import 'dart:convert';
 
-import 'package:edu_ready/main.dart';
 import 'package:edu_ready/model/absensi_bulanan.dart';
 import 'package:edu_ready/model/absensi_harian.dart';
-import 'package:edu_ready/model/user.dart';
+import 'package:edu_ready/model/user_redirect.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,10 +13,8 @@ class AbsensiProvider with ChangeNotifier {
   final List<AbsensiBulanan> _listbulanan = [];
   List<AbsensiBulanan> get listabsensibulanan => _listbulanan;
 
-  String urlHarian = "${MyApp.domain}/api/v1/list-absen-anak";
-  String urlBulanan =
-      "${MyApp.domain}/api/v1/list-absen-anak-andro";
-
+  String urlHarian = "";
+  String urlBulanan = "";
   String token = "";
   String idOrtu = "";
 
@@ -25,11 +22,13 @@ class AbsensiProvider with ChangeNotifier {
 
   Future<void> getabsensiharian() async {
     SharedPreferences sp = await SharedPreferences.getInstance();
-    Map<String, dynamic> user = json.decode(sp.getString('user') ?? "");
-    var getUser = User.fromJson(user);
+    Map<String, dynamic> user = json.decode(sp.getString('user_domain') ?? "");
+    var getUser = UserDomain.fromJson(user);
     token = getUser.data!.token!;
     idOrtu = getUser.data!.user!.idnya!;
 
+    String urlDomain = sp.getString('domain') ?? "";
+    urlHarian = "$urlDomain/api/v1/list-absen-anak";
     var url = Uri.parse("$urlHarian?idortu=$idOrtu&page=1");
     Map<String, String> headers = {"Authorization": "Bearer $token"};
 
@@ -75,11 +74,14 @@ class AbsensiProvider with ChangeNotifier {
 
   Future<void> getabsensibulanan() async {
     SharedPreferences sp = await SharedPreferences.getInstance();
-    Map<String, dynamic> user = json.decode(sp.getString('user') ?? "");
-    var userdata = User.fromJson(user);
+
+    Map<String, dynamic> user = json.decode(sp.getString('user_domain') ?? "");
+    var userdata = UserDomain.fromJson(user);
     String? tokenb = userdata.data!.token;
     String? idortub = userdata.data!.user!.idnya;
 
+    String urlDomain = sp.getString('domain') ?? "";
+    urlBulanan = "$urlDomain/api/v1/list-absen-anak-andro";
     var url = Uri.parse("$urlBulanan?idortu=$idortub");
     Map<String, String> headers = {"Authorization": "Bearer $tokenb"};
 
@@ -90,7 +92,7 @@ class AbsensiProvider with ChangeNotifier {
         var decodeData = json.decode(response.body);
 
         if (decodeData["data"].toString().contains("[]")) {
-        }else{
+        } else {
           _listbulanan.add(AbsensiBulanan.fromJson(decodeData));
           notifyListeners();
         }

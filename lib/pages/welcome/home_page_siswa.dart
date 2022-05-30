@@ -10,17 +10,15 @@ import 'package:edu_ready/pages/absensi/absensi_page.dart';
 import 'package:edu_ready/pages/akademik/akademik_page.dart';
 import 'package:edu_ready/pages/batasmateri/batas_materi_page.dart';
 import 'package:edu_ready/pages/informasi/informasi_page.dart';
-import 'package:edu_ready/pages/pembayaran/pembayaran_page.dart';
 import 'package:edu_ready/pages/saldo/history_saldo_page.dart';
 import 'package:edu_ready/pages/saldo/top_up_page.dart';
 import 'package:edu_ready/providers/dashboard_provider.dart';
 import 'package:edu_ready/utils/currency.dart';
-import 'package:edu_ready/widgets/data_siswa_popup.dart';
 import 'package:edu_ready/widgets/no_internet_widget.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_beautiful_popup/main.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
@@ -28,15 +26,15 @@ import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+class HomePageSiswa extends StatefulWidget {
+  const HomePageSiswa({Key? key}) : super(key: key);
   static const pageRoute = '/home';
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<HomePageSiswa> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePageSiswa> {
   bool firstinitdashboard = true;
   bool statusPenilaian = false;
   bool isInternet = true;
@@ -366,556 +364,466 @@ class _HomePageState extends State<HomePage> {
                           ////////////////////bagian card saldo///////////////////////////////
                           Container(
                             width: double.infinity,
-                            height: 250,
-                            margin: EdgeInsets.only(bottom: 40),
                             decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: const [
-                                  Color(0xFFFF8C00),
-                                  Color(0xFFFFA726),
-                                ],
-                              ),
-                              borderRadius: BorderRadius.only(
-                                bottomLeft: Radius.circular(40),
-                                bottomRight: Radius.circular(40),
-                              ),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(20.0),
-                              child: Stack(
-                                children: [
-                                  ///column saldo,top up///
-                                  Column(
-                                    mainAxisSize: MainAxisSize.min,
+                                image: DecorationImage(
+                                    image: AssetImage(
+                                        "assets/images/bg_saldo.png"),
+                                    fit: BoxFit.cover)),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 20, vertical: 4),
+                                  child: Row(
                                     children: [
-                                      Row(
-                                        children: [
-                                          //row saldo//
-                                          Expanded(
-                                            child: SizedBox(
-                                              width: double.infinity,
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Row(
-                                                    children: const [
-                                                      Icon(
-                                                        CupertinoIcons
-                                                            .money_dollar_circle_fill,
-                                                        color: Colors.white,
-                                                      ),
-                                                      Text("Informasi Saldo",
-                                                          style: TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: 18,
-                                                          )),
-                                                    ],
-                                                  ),
-                                                  Text(
-                                                    "${CurrencyFormat.convertToIdr(data[0].saldo!, 0)} ",
-                                                    style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 24,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-
-                                          //row top up//
-                                          Expanded(
-                                            child: SizedBox(
-                                              width: double.infinity,
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.end,
-                                                mainAxisSize: MainAxisSize.max,
-                                                children: [
-                                                  Column(
-                                                    mainAxisSize:
-                                                        MainAxisSize.max,
-                                                    children: [
-                                                      IconButton(
-                                                          onPressed: () {
-                                                            Navigator.push(
-                                                              context,
-                                                              CupertinoPageRoute(
-                                                                builder:
-                                                                    (context) =>
-                                                                        TopUpPage(),
-                                                              ),
-                                                            );
-                                                          },
-                                                          icon: Icon(
-                                                            CupertinoIcons
-                                                                .tray_arrow_down,
-                                                            color: Colors.white,
-                                                          )),
-                                                      Text(
-                                                        "Top Up",
-                                                        style: TextStyle(
-                                                            color: Colors.white,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .bold),
-                                                      )
-                                                    ],
-                                                  ),
-                                                  SizedBox(
-                                                    width: 20,
-                                                  ),
-                                                  Column(
-                                                    children: [
-                                                      IconButton(
-                                                          onPressed: () {
-                                                            Navigator.push(
-                                                              context,
-                                                              CupertinoPageRoute(
-                                                                builder:
-                                                                    (context) =>
-                                                                        HistorySaldo(),
-                                                              ),
-                                                            );
-                                                          },
-                                                          icon: Icon(
-                                                            // Icons.history_edu,
-                                                            CupertinoIcons
-                                                                .doc_append,
-                                                            color: Colors.white,
-                                                          )),
-                                                      Text(
-                                                        "History",
-                                                        style: TextStyle(
-                                                            color: Colors.white,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .bold),
-                                                      )
-                                                    ],
-                                                  )
-                                                ],
-                                              ),
-                                            ),
-                                          )
-                                        ],
-                                      ),
-
-                                      ///data user siswa///
-                                      GestureDetector(
-                                        onTap: () {
-                                          if (data[0]
-                                              .showtanggungan!
-                                              .isNotEmpty) {
-                                            final popup = BeautifulPopup(
-                                                context: context,
-                                                template: TemplateTerm);
-                                            popup.show(
-                                                title: 'Detail Data Siswa',
-                                                content:
-                                                    DataSiswaPopup(data: data),
-                                                barrierDismissible: true);
-                                          }
-                                        },
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      vertical: 20),
-                                              child: (data[0]
-                                                      .showtanggungan!
-                                                      .isEmpty)
-                                                  ? Center(
-                                                      child: Text(
-                                                          "Tidak ada data"),
-                                                    )
-                                                  : Row(
-                                                      mainAxisSize:
-                                                          MainAxisSize.max,
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .center,
-                                                      children: [
-                                                        ClipRRect(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(48),
-                                                          child: SizedBox(
-                                                            width: 65,
-                                                            height: 65,
-                                                            child: FittedBox(
-                                                              fit: BoxFit.cover,
-                                                              child:
-                                                                  CachedNetworkImage(
-                                                                imageUrl:
-                                                                    "$urlimage${data[0].showtanggungan![0].ppsiswa}",
-                                                                placeholder: (context,
-                                                                        url) =>
-                                                                    CupertinoActivityIndicator(),
-                                                                errorWidget: (context,
-                                                                        url,
-                                                                        error) =>
-                                                                    Icon(CupertinoIcons
-                                                                        .profile_circled),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        SizedBox(
-                                                          width: 15,
-                                                        ),
-                                                        Expanded(
-                                                          child: Column(
-                                                            mainAxisSize:
-                                                                MainAxisSize
-                                                                    .min,
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .end,
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              SizedBox(
-                                                                height: 5,
-                                                              ),
-                                                              Text(
-                                                                "Nama   :   ${data[0].showtanggungan![0].namasiswa}",
-                                                                overflow:
-                                                                    TextOverflow
-                                                                        .ellipsis,
-                                                                maxLines: 3,
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        16,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w700,
-                                                                    color: Colors
-                                                                        .white),
-                                                              ),
-                                                              SizedBox(
-                                                                height: 5,
-                                                              ),
-                                                              Text(
-                                                                "NIS / NISN    :   ${data[0].showtanggungan![0].noinduk} /  ${data[0].showtanggungan![0].nisn}",
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        14,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w500,
-                                                                    color: Colors
-                                                                        .white),
-                                                              ),
-                                                              SizedBox(
-                                                                height: 5,
-                                                              ),
-                                                              Text(
-                                                                "Kelas   :   ${data[0].showtanggungan![0].nama} - ${data[0].showtanggungan![0].namatingkat}",
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        14,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w500,
-                                                                    color: Colors
-                                                                        .white),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-
-                                  Align(
-                                    alignment: Alignment.bottomCenter,
-                                    child: Transform.translate(
-                                        offset: Offset(0, 50),
-                                        child:
-                                            ///////////////////////bagian card menu/////////////////////////////////////
-                                            SizedBox(
+                                      //row saldo//
+                                      Expanded(
+                                        child: SizedBox(
                                           width: double.infinity,
-                                          height: 90,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceAround,
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
-                                              Expanded(
-                                                child: Card(
-                                                  color: Colors.white,
-                                                  elevation: 1,
-                                                  shape: RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              4)),
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceAround,
-                                                      children: [
-                                                        Column(
-                                                          children: [
-                                                            GestureDetector(
-                                                              child: ClipRRect(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            45),
-                                                                child:
-                                                                    Container(
-                                                                  color: Color(
-                                                                      0xFFFF8C00),
-                                                                  child:
-                                                                      Padding(
-                                                                    padding: const EdgeInsets
-                                                                            .all(
-                                                                        10.0),
-                                                                    child: Image
-                                                                        .asset(
-                                                                      "assets/images/akademik.png",
-                                                                      width: 30,
-                                                                      height:
-                                                                          30,
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                              onTap: () {
-                                                                Navigator.push(
-                                                                  context,
-                                                                  CupertinoPageRoute(
-                                                                    builder:
-                                                                        (context) =>
-                                                                            AkademikPage(),
-                                                                  ),
-                                                                );
-                                                              },
-                                                            ),
-                                                            Text("Akademik")
-                                                          ],
-                                                        ),
-                                                        Column(
-                                                          children: [
-                                                            GestureDetector(
-                                                              onTap: () {
-                                                                Navigator.push(
-                                                                  context,
-                                                                  CupertinoPageRoute(
-                                                                    builder:
-                                                                        (context) =>
-                                                                            PembayaranPage(),
-                                                                  ),
-                                                                );
-                                                              },
-                                                              child: ClipRRect(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            45),
-                                                                child:
-                                                                    Container(
-                                                                  color: Color(
-                                                                      0xFFFF8C00),
-                                                                  child:
-                                                                      Padding(
-                                                                    padding: const EdgeInsets
-                                                                            .all(
-                                                                        10.0),
-                                                                    child: Image
-                                                                        .asset(
-                                                                      "assets/images/absensi.png",
-                                                                      width: 30,
-                                                                      height:
-                                                                          30,
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Text("Pembayaran")
-                                                          ],
-                                                        ),
-                                                        Column(
-                                                          children: [
-                                                            GestureDetector(
-                                                              child: ClipRRect(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            45),
-                                                                child:
-                                                                    Container(
-                                                                  color: Color(
-                                                                      0xFFFF8C00),
-                                                                  child:
-                                                                      Padding(
-                                                                    padding: const EdgeInsets
-                                                                            .all(
-                                                                        10.0),
-                                                                    child: Image
-                                                                        .asset(
-                                                                      "assets/images/informasi.png",
-                                                                      width: 30,
-                                                                      height:
-                                                                          30,
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                              onTap: () {
-                                                                Navigator.push(
-                                                                  context,
-                                                                  CupertinoPageRoute(
-                                                                    builder:
-                                                                        (context) =>
-                                                                            InformasiPage(),
-                                                                  ),
-                                                                );
-                                                              },
-                                                            ),
-                                                            Text("Informasi")
-                                                          ],
-                                                        ),
-                                                        Column(
-                                                          children: [
-                                                            GestureDetector(
-                                                              child: ClipRRect(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            45),
-                                                                child:
-                                                                    Container(
-                                                                  color: Color(
-                                                                      0xFFFF8C00),
-                                                                  child:
-                                                                      Padding(
-                                                                    padding: const EdgeInsets
-                                                                            .all(
-                                                                        10.0),
-                                                                    child: Image
-                                                                        .asset(
-                                                                      "assets/images/absensi.png",
-                                                                      width: 30,
-                                                                      height:
-                                                                          30,
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                              onTap: () {
-                                                                Navigator.push(
-                                                                  context,
-                                                                  CupertinoPageRoute(
-                                                                    builder:
-                                                                        (context) =>
-                                                                            AbsensiPage(),
-                                                                  ),
-                                                                );
-                                                              },
-                                                            ),
-                                                            Text("Absensi")
-                                                          ],
-                                                        ),
-                                                      ],
-                                                    ),
+                                              Row(
+                                                children: const [
+                                                  Icon(
+                                                    CupertinoIcons
+                                                        .money_dollar_circle_fill,
+                                                    color: Colors.white,
                                                   ),
-                                                ),
+                                                  Text("Informasi Saldo",
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 18,
+                                                      )),
+                                                ],
+                                              ),
+                                              Text(
+                                                "${CurrencyFormat.convertToIdr(data[0].saldo!, 0)} ",
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 24,
+                                                    fontWeight:
+                                                        FontWeight.bold),
                                               ),
                                             ],
                                           ),
-                                        )),
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
+                                        ),
+                                      ),
 
-                          /////////////////////////bagian card tagihan/////////////////////////
-                          SizedBox(
-                            width: double.infinity,
-                            child: Column(
-                              children: [
-                                Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 15),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        "Total Tagihan",
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
+                                      //row top up//
+                                      Expanded(
+                                        child: SizedBox(
+                                          width: double.infinity,
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
+                                            mainAxisSize: MainAxisSize.max,
+                                            children: [
+                                              Column(
+                                                mainAxisSize: MainAxisSize.max,
+                                                children: [
+                                                  IconButton(
+                                                      onPressed: () {
+                                                        Navigator.push(
+                                                          context,
+                                                          CupertinoPageRoute(
+                                                            builder:
+                                                                (context) =>
+                                                                    TopUpPage(),
+                                                          ),
+                                                        );
+                                                      },
+                                                      icon: Icon(
+                                                        CupertinoIcons
+                                                            .tray_arrow_down,
+                                                        color: Colors.white,
+                                                      )),
+                                                  Text(
+                                                    "Top Up",
+                                                    style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  )
+                                                ],
+                                              ),
+                                              SizedBox(
+                                                width: 20,
+                                              ),
+                                              Column(
+                                                children: [
+                                                  IconButton(
+                                                      onPressed: () {
+                                                        Navigator.push(
+                                                          context,
+                                                          CupertinoPageRoute(
+                                                            builder: (context) =>
+                                                                HistorySaldo(),
+                                                          ),
+                                                        );
+                                                      },
+                                                      icon: Icon(
+                                                        // Icons.history_edu,
+                                                        CupertinoIcons
+                                                            .doc_append,
+                                                        color: Colors.white,
+                                                      )),
+                                                  Text(
+                                                    "History",
+                                                    style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  )
+                                                ],
+                                              )
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                      GestureDetector(
-                                        onTap: () {
-                                          Navigator.push(
-                                            context,
-                                            CupertinoPageRoute(
-                                              builder: (context) =>
-                                                  PembayaranPage(),
-                                            ),
-                                          );
-                                        },
-                                        child: Icon(
-                                          Icons.arrow_forward_ios_rounded,
-                                          size: 18,
-                                          color: Color(0xFFFFA726),
-                                        ),
-                                      ),
+                                      )
                                     ],
                                   ),
                                 ),
-                                Card(
-                                  color: Colors.white,
-                                  elevation: 0.5,
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Container(
+                                  width: double.infinity,
+                                  height: 180,
                                   margin: EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 5),
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(6)),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(12.0),
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                            child: Text(
-                                          "Bulan Ini :\n ${CurrencyFormat.convertToIdr(int.parse(data[0].bDepanSekarang![0].blnSekarang ?? "0"), 0)}",
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
-                                              color: Color(0xFFFFA726)),
-                                        )),
-                                        Expanded(
-                                            child: Text(
-                                          "Bulan Depan : \n ${CurrencyFormat.convertToIdr(int.parse(data[0].bDepanSekarang![0].blnDepan ?? "0"), 0)}",
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.grey),
-                                        )),
-                                      ],
+                                      vertical: 5, horizontal: 10),
+                                  child: Card(
+                                    color: Colors.white,
+                                    elevation: 1,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(4)),
+                                    child: Padding(
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 10),
+                                      child: Column(
+                                        children: [
+                                          ///row menu atas///
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceAround,
+                                            children: [
+                                              Column(
+                                                children: [
+                                                  GestureDetector(
+                                                    child: ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              45),
+                                                      child: Container(
+                                                        color:
+                                                            Color(0xFFFF8C00),
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(10.0),
+                                                          child: Image.asset(
+                                                            "assets/images/akademik.png",
+                                                            width: 30,
+                                                            height: 30,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    onTap: () {
+                                                      Navigator.push(
+                                                        context,
+                                                        CupertinoPageRoute(
+                                                          builder: (context) =>
+                                                              AkademikPage(),
+                                                        ),
+                                                      );
+                                                    },
+                                                  ),
+                                                  Text("Akademik")
+                                                ],
+                                              ),
+                                              Column(
+                                                children: [
+                                                  GestureDetector(
+                                                    child: ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              45),
+                                                      child: Container(
+                                                        color:
+                                                            Color(0xFFFF8C00),
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(10.0),
+                                                          child: Image.asset(
+                                                            "assets/images/absensi.png",
+                                                            width: 30,
+                                                            height: 30,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    onTap: () {
+                                                      Navigator.push(
+                                                        context,
+                                                        CupertinoPageRoute(
+                                                          builder: (context) =>
+                                                              AbsensiPage(),
+                                                        ),
+                                                      );
+                                                    },
+                                                  ),
+                                                  Text("Absensi")
+                                                ],
+                                              ),
+                                              Column(
+                                                children: [
+                                                  GestureDetector(
+                                                    child: ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              45),
+                                                      child: Container(
+                                                        color:
+                                                            Color(0xFFFF8C00),
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(10.0),
+                                                          child: Image.asset(
+                                                            "assets/images/informasi.png",
+                                                            width: 30,
+                                                            height: 30,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    onTap: () {
+                                                      Navigator.push(
+                                                        context,
+                                                        CupertinoPageRoute(
+                                                          builder: (context) =>
+                                                              InformasiPage(),
+                                                        ),
+                                                      );
+                                                    },
+                                                  ),
+                                                  Text("Informasi")
+                                                ],
+                                              ),
+                                              Column(
+                                                children: [
+                                                  GestureDetector(
+                                                    onTap: () {},
+                                                    child: ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              45),
+                                                      child: Container(
+                                                        color:
+                                                            Color(0xFFFF8C00),
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(10.0),
+                                                          child: Image.asset(
+                                                            "assets/images/one_text.png",
+                                                            width: 30,
+                                                            height: 30,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Text("Materi")
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(
+                                            height: 15,
+                                          ),
+
+                                          ///row menu bawah///
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceAround,
+                                            children: [
+                                              Column(
+                                                children: [
+                                                  GestureDetector(
+                                                    child: ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              45),
+                                                      child: Container(
+                                                        color:
+                                                            Color(0xFFFF8C00),
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(10.0),
+                                                          child: Image.asset(
+                                                            "assets/images/one_text.png",
+                                                            width: 30,
+                                                            height: 30,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    onTap: () {},
+                                                  ),
+                                                  Text("Video")
+                                                ],
+                                              ),
+                                              Column(
+                                                children: [
+                                                  GestureDetector(
+                                                    onTap: () {},
+                                                    child: ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              45),
+                                                      child: Container(
+                                                        color:
+                                                            Color(0xFFFF8C00),
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(10.0),
+                                                          child: Image.asset(
+                                                            "assets/images/one_text.png",
+                                                            width: 30,
+                                                            height: 30,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Text("Tugas")
+                                                ],
+                                              ),
+                                              Column(
+                                                children: [
+                                                  GestureDetector(
+                                                    child: ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              45),
+                                                      child: Container(
+                                                        color:
+                                                            Color(0xFFFF8C00),
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(10.0),
+                                                          child: Image.asset(
+                                                            "assets/images/one_text.png",
+                                                            width: 30,
+                                                            height: 30,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    onTap: () {},
+                                                  ),
+                                                  Text("Latihan")
+                                                ],
+                                              ),
+                                              Column(
+                                                children: [
+                                                  GestureDetector(
+                                                    child: ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              45),
+                                                      child: Container(
+                                                        color:
+                                                            Color(0xFFFF8C00),
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(10.0),
+                                                          child: Image.asset(
+                                                            "assets/images/one_text.png",
+                                                            width: 30,
+                                                            height: 30,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    onTap: () {
+                                                      showModalBottomSheet(
+                                                        context: context,
+                                                        isScrollControlled:
+                                                            true,
+                                                        builder: (context) {
+                                                          return DraggableScrollableSheet(
+                                                            expand: false,
+                                                            builder: (context,
+                                                                    scrollController) =>
+                                                                Container(
+                                                              color:
+                                                                  Colors.white,
+                                                              child:
+                                                                  SingleChildScrollView(
+                                                                controller:
+                                                                    scrollController,
+                                                                child: Column(
+                                                                  children: [
+                                                                    Center(
+                                                                      child: Icon(CupertinoIcons.line_horizontal_3),
+                                                                    ),
+                                                                    Row(
+                                                                      children: [
+                                                                        Text(
+                                                                            "1"),
+                                                                        Text(
+                                                                            "2"),
+                                                                        Text(
+                                                                            "3"),
+                                                                        Text(
+                                                                            "4"),
+                                                                      ],
+                                                                    ),
+                                                                    Row(
+                                                                      children: [
+                                                                        Text(
+                                                                            "5"),
+                                                                        Text(
+                                                                            "6"),
+                                                                        Text(
+                                                                            "7"),
+                                                                        Text(
+                                                                            "8"),
+                                                                      ],
+                                                                    )
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            initialChildSize:
+                                                                0.6,
+                                                            minChildSize: 0,
+                                                            maxChildSize: 0.96,
+                                                          );
+                                                        },
+                                                      );
+                                                    },
+                                                  ),
+                                                  Text("Lainnya")
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
+                                )
                               ],
                             ),
                           ),

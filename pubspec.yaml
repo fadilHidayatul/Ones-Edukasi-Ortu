@@ -37,6 +37,7 @@ dependencies:
   google_fonts: ^2.2.0
   provider: ^6.0.2
   http: ^0.13.4
+  html: ^0.15.0
   shared_preferences: ^2.0.11
   intl: ^0.17.0
   percent_indicator: ^3.4.0
@@ -45,7 +46,6 @@ dependencies:
   dropdown_search: ^2.0.1
   shifting_tabbar: ^1.0.2
   cached_network_image: ^3.2.0
-  # flutter_pdfview: ^1.2.1
   path_provider: ^2.0.8
   fl_chart: ^0.41.0
   currency_text_input_formatter: ^2.1.5
@@ -54,6 +54,10 @@ dependencies:
   internet_connection_checker: ^0.0.1+3
   lottie: ^1.2.2
   fluttertoast: ^8.0.9
+  translator: ^0.1.7
+
+  
+  # flutter_pdfview: ^1.2.1
   
 
 dev_dependencies:
@@ -81,6 +85,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/one_text.png
+    - assets/images/bg_saldo.png
     - assets/images/ic_akademik.png
     - assets/images/ic_pembayaran.png
     - assets/images/ic_absensi.png
@@ -89,6 +94,11 @@ flutter:
     - assets/images/absensi.png
     - assets/images/informasi.png
     - assets/images/akademik.png
+    - assets/images/login_illus.png
+    - assets/images/google.png
+    - assets/images/frame_profil.png
+    - assets/images/email_verifikasi.png
+    - assets/lottie/ic_redirect.json
     - assets/lottie/ic_disconnect.json
     - assets/lottie/ic_no_data.json
     - assets/lottie/ic_splash.json

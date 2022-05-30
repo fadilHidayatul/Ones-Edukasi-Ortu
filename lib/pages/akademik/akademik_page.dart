@@ -187,7 +187,7 @@ class _AkademikPageState extends State<AkademikPage> {
     if (args != null) {
       setState(() => groupvalue = args as int);
     }
-    
+
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size(double.infinity, AppBar().preferredSize.height),
@@ -363,8 +363,8 @@ class _AkademikPageState extends State<AkademikPage> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
                                         children: const [
-                                          Text("Mata Pelajaran"),
-                                          Text("Nilai"),
+                                          Expanded(flex: 8,child: Text("Mata Pelajaran")),
+                                          Expanded(flex: 1,child: Text("Nilai")),
                                         ],
                                       ),
                                     ),
@@ -442,8 +442,17 @@ class _AkademikPageState extends State<AkademikPage> {
                                                     flex: 1,
                                                     child: Text((selectedNilai ==
                                                             "SEMUA")
-                                                        ? "${dataakaumum[index].nilainya}"
-                                                        : "${dataumumfiltered[index].nilainya}"))
+                                                        ? dataakaumum[index]
+                                                                    .nilainya ==
+                                                                null
+                                                            ? "0"
+                                                            : "${dataakaumum[index].nilainya}"
+                                                        : dataumumfiltered[
+                                                                        index]
+                                                                    .nilainya ==
+                                                                null
+                                                            ? "0"
+                                                            : "${dataumumfiltered[index].nilainya}"))
                                               ],
                                             ),
                                           );

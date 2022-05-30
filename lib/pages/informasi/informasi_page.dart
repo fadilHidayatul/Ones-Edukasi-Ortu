@@ -312,7 +312,7 @@ class _InformasiPageState extends State<InformasiPage> {
                                                                         .last ==
                                                                     "pdf")
                                                                 ? Image.asset(
-                                                                    "assets/images/splash.png")
+                                                                    "assets/images/one_text.png")
                                                                 : CachedNetworkImage(
                                                                     imageUrl:
                                                                         "$urlimage${listumumterbaru[index].pathDokumen}",

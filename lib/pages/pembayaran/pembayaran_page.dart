@@ -741,7 +741,10 @@ class _PembayaranPageState extends State<PembayaranPage> {
                                                                             setState(() {
                                                                               loadingconfirm = false;
                                                                             });
+
                                                                             _getfirstpembayaran();
+                                                                            _getfirstriwayatpembayaran();
+                                                                            
                                                                             Navigator.pop(context);
                                                                             showCupertinoDialog(
                                                                               context: context,

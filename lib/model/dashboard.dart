@@ -203,7 +203,7 @@ class NilaiDashboard {
   String realnamapel;
   DateTime tanggal;
   String? tipe;
-  int nilainya;
+  dynamic nilainya;
   int idmpel;
   int idguru;
 

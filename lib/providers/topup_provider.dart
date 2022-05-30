@@ -1,26 +1,26 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:edu_ready/main.dart';
-import 'package:edu_ready/model/user.dart';
+import 'package:edu_ready/model/user_redirect.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TopupProvider with ChangeNotifier {
-  String masterurl =
-      "${MyApp.domain}/api/v1/top-up/pitimasuak";
-
   senddatatopup(int uang, File imageBukti) async {
     SharedPreferences sp = await SharedPreferences.getInstance();
-    Map<String, dynamic> user = json.decode(sp.getString('user') ?? "");
-    var getuser = User.fromJson(user);
+
+    Map<String, dynamic> user = json.decode(sp.getString('user_domain') ?? "");
+    var getuser = UserDomain.fromJson(user);
     var token = getuser.data!.token;
     var idortu = getuser.data!.user!.idnya;
 
-    Map<String, String> headers = {"Authentication": "Bearer $token"};
+    String urlDomain = sp.getString('domain') ?? "";
+    String masterurl = "$urlDomain/api/v1/top-up/pitimasuak";
     Uri url = Uri.parse("$masterurl?idortu=$idortu&pitih=$uang");
+
+    Map<String, String> headers = {"Authentication": "Bearer $token"};
 
     Stream<List<int>> stream = http.ByteStream(imageBukti.openRead()).cast();
     var length = await imageBukti.length();

@@ -1,34 +1,34 @@
 // To parse this JSON data, do
 //
-//     final user = userFromJson(jsonString);
+//     final userDomain = userDomainFromJson(jsonString);
 
 import 'dart:convert';
 
-User userFromJson(String str) => User.fromJson(json.decode(str));
+UserDomain userDomainFromJson(String str) => UserDomain.fromJson(json.decode(str));
 
-String userToJson(User data) => json.encode(data.toJson());
+String userDomainToJson(UserDomain data) => json.encode(data.toJson());
 
-class User {
-    User({
+class UserDomain { 
+    UserDomain({
         this.status,
-        this.header,
+        this.message,
         this.data,
     });
 
     String? status;
-    String? header;
+    String? message;
     Data? data;
 
-    factory User.fromJson(Map<String, dynamic> json) => User(
+    factory UserDomain.fromJson(Map<String, dynamic> json) => UserDomain(
         status: json["status"],
-        header: json["header"],
+        message: json["message"],
         data: Data.fromJson(json["data"]),
     );
 
     Map<String, dynamic> toJson() => {
         "status": status,
-        "header": header,
-        "data": data?.toJson(),
+        "message": message,
+        "data": data!.toJson(),
     };
 }
 
@@ -39,25 +39,25 @@ class Data {
         this.routes,
     });
 
-    UserClass? user;
+    User? user;
     String? token;
-    List<String>? routes;
+    List<String>? routes = [];
 
     factory Data.fromJson(Map<String, dynamic> json) => Data(
-        user: UserClass.fromJson(json["user"]),
+        user: User.fromJson(json["user"]),
         token: json["token"],
         routes: List<String>.from(json["routes"].map((x) => x)),
     );
 
     Map<String, dynamic> toJson() => {
-        "user": user?.toJson(),
+        "user": user!.toJson(),
         "token": token,
         "routes": List<dynamic>.from(routes!.map((x) => x)),
     };
 }
 
-class UserClass {
-    UserClass({
+class User {
+    User({
         this.idnya,
         this.name,
         this.email,
@@ -71,7 +71,7 @@ class UserClass {
     String? phone;
     String? avatar;
 
-    factory UserClass.fromJson(Map<String, dynamic> json) => UserClass(
+    factory User.fromJson(Map<String, dynamic> json) => User(
         idnya: json["idnya"],
         name: json["name"],
         email: json["email"],

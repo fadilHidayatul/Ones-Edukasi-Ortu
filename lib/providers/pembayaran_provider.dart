@@ -1,11 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:edu_ready/main.dart';
 import 'package:edu_ready/model/detail_riwayat_pembayaran.dart';
 import 'package:edu_ready/model/pembayaran.dart';
 import 'package:edu_ready/model/riwayat_pembayaran.dart';
-import 'package:edu_ready/model/user.dart';
+import 'package:edu_ready/model/user_redirect.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
@@ -21,24 +20,29 @@ class PembayaranProvider with ChangeNotifier {
   final List<DetailRiwayatPembayaran> _listdetail = [];
   List<DetailRiwayatPembayaran> get listdetailriwayat => _listdetail;
 
-  String urlmaster = "${MyApp.domain}/api/v1/alokasi-pembayaran-search-gani";
-  String urlPost = "${MyApp.domain}/api/v1/pembayaran-siswa/storeAndro";
-  String urlriwayat = "${MyApp.domain}/api/v1/riwayat-pembayaran-andro";
-  String urlriwayatdetail = "${MyApp.domain}/api/v1/detail-pembayaran-andro";
-  String urlPostBukti = "${MyApp.domain}/api/v1/pembayaran-siswa/storeBukti";
+  String urlmaster = "";
+  String urlPost = "";
+  String urlriwayat = "";
+  String urlriwayatdetail = "";
+  String urlPostBukti = "";
   String token = "";
   String idortu = "";
 
   Future<void> getfirstpembayaran() async {
     SharedPreferences sp = await SharedPreferences.getInstance();
-    Map<String, dynamic> user = json.decode(sp.getString('user') ?? "");
-    var getuser = User.fromJson(user);
+
+    Map<String, dynamic> user = json.decode(sp.getString('user_domain') ?? "");
+    var getuser = UserDomain.fromJson(user);
     token = getuser.data!.token!;
     idortu = getuser.data!.user!.idnya!;
 
-    Map<String, String> headers = {"Authorization": "Bearer $token"};
+    String urlDomain = sp.getString('domain') ?? "";
+    urlmaster = "$urlDomain/api/v1/alokasi-pembayaran-search-gani";
+    urlPost = "$urlDomain/api/v1/pembayaran-siswa/storeAndro";
+
 
     Uri url = Uri.parse("$urlmaster?idortu=$idortu&page=1");
+    Map<String, String> headers = {"Authorization": "Bearer $token"};
 
     try {
       var response = await http.get(url, headers: headers);
@@ -84,8 +88,9 @@ class PembayaranProvider with ChangeNotifier {
       "Authorization": "Bearer $token",
       "Content-Type": "application/json",
     };
-
+    
     Uri url = Uri.parse(urlPost);
+
     var body = {"items": arrayItem};
 
     try {
@@ -106,14 +111,19 @@ class PembayaranProvider with ChangeNotifier {
 
   Future<void> getfirstriwayatpembayaran() async {
     SharedPreferences sp = await SharedPreferences.getInstance();
-    Map<String, dynamic> user = json.decode(sp.getString('user') ?? "");
-    var getuser = User.fromJson(user);
+
+    Map<String, dynamic> user = json.decode(sp.getString('user_domain') ?? "");
+    var getuser = UserDomain.fromJson(user);
     token = getuser.data!.token!;
     idortu = getuser.data!.user!.idnya!;
 
-    Map<String, String> headers = {"Authorization": "Bearer $token"};
+    String urlDomain = sp.getString('domain') ?? "";
+    urlriwayat = "$urlDomain/api/v1/riwayat-pembayaran-andro";
+    urlriwayatdetail = "$urlDomain/api/v1/detail-pembayaran-andro";
+    urlPostBukti = "$urlDomain/api/v1/pembayaran-siswa/storeBukti";
 
     Uri url = Uri.parse("$urlriwayat?ortu=$idortu&page=1");
+    Map<String, String> headers = {"Authorization": "Bearer $token"};
 
     try {
       var response = await http.get(url, headers: headers);
