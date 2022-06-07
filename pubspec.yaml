@@ -55,6 +55,7 @@ dependencies:
   lottie: ^1.2.2
   fluttertoast: ^8.0.9
   translator: ^0.1.7
+  badges: ^2.0.2
 
   
   # flutter_pdfview: ^1.2.1
@@ -91,6 +92,12 @@ flutter:
     - assets/images/ic_absensi.png
     - assets/images/ic_informasi.png
     - assets/images/ic_nodata.png
+    - assets/images/ic_materi.png
+    - assets/images/ic_video.png
+    - assets/images/ic_tugas.png
+    - assets/images/ic_latihan.png
+    - assets/images/ic_donasi.png
+    - assets/images/ic_lainnya.png
     - assets/images/absensi.png
     - assets/images/informasi.png
     - assets/images/akademik.png

@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:badges/badges.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:edu_ready/model/dashboard.dart';
 import 'package:edu_ready/model/user_redirect.dart';
@@ -509,138 +510,10 @@ class _HomePageState extends State<HomePageSiswa> {
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceAround,
                                             children: [
-                                              Column(
-                                                children: [
-                                                  GestureDetector(
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              45),
-                                                      child: Container(
-                                                        color:
-                                                            Color(0xFFFF8C00),
-                                                        child: Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(10.0),
-                                                          child: Image.asset(
-                                                            "assets/images/akademik.png",
-                                                            width: 30,
-                                                            height: 30,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    onTap: () {
-                                                      Navigator.push(
-                                                        context,
-                                                        CupertinoPageRoute(
-                                                          builder: (context) =>
-                                                              AkademikPage(),
-                                                        ),
-                                                      );
-                                                    },
-                                                  ),
-                                                  Text("Akademik")
-                                                ],
-                                              ),
-                                              Column(
-                                                children: [
-                                                  GestureDetector(
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              45),
-                                                      child: Container(
-                                                        color:
-                                                            Color(0xFFFF8C00),
-                                                        child: Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(10.0),
-                                                          child: Image.asset(
-                                                            "assets/images/absensi.png",
-                                                            width: 30,
-                                                            height: 30,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    onTap: () {
-                                                      Navigator.push(
-                                                        context,
-                                                        CupertinoPageRoute(
-                                                          builder: (context) =>
-                                                              AbsensiPage(),
-                                                        ),
-                                                      );
-                                                    },
-                                                  ),
-                                                  Text("Absensi")
-                                                ],
-                                              ),
-                                              Column(
-                                                children: [
-                                                  GestureDetector(
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              45),
-                                                      child: Container(
-                                                        color:
-                                                            Color(0xFFFF8C00),
-                                                        child: Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(10.0),
-                                                          child: Image.asset(
-                                                            "assets/images/informasi.png",
-                                                            width: 30,
-                                                            height: 30,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    onTap: () {
-                                                      Navigator.push(
-                                                        context,
-                                                        CupertinoPageRoute(
-                                                          builder: (context) =>
-                                                              InformasiPage(),
-                                                        ),
-                                                      );
-                                                    },
-                                                  ),
-                                                  Text("Informasi")
-                                                ],
-                                              ),
-                                              Column(
-                                                children: [
-                                                  GestureDetector(
-                                                    onTap: () {},
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              45),
-                                                      child: Container(
-                                                        color:
-                                                            Color(0xFFFF8C00),
-                                                        child: Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(10.0),
-                                                          child: Image.asset(
-                                                            "assets/images/one_text.png",
-                                                            width: 30,
-                                                            height: 30,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  Text("Materi")
-                                                ],
-                                              ),
+                                              akademik(context),
+                                              absensi(context),
+                                              informasi(context),
+                                              materi(),
                                             ],
                                           ),
                                           SizedBox(
@@ -652,6 +525,9 @@ class _HomePageState extends State<HomePageSiswa> {
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceAround,
                                             children: [
+                                              video(),
+                                              tugas(),
+                                              latihan(),
                                               Column(
                                                 children: [
                                                   GestureDetector(
@@ -667,88 +543,8 @@ class _HomePageState extends State<HomePageSiswa> {
                                                               const EdgeInsets
                                                                   .all(10.0),
                                                           child: Image.asset(
-                                                            "assets/images/one_text.png",
-                                                            width: 30,
-                                                            height: 30,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    onTap: () {},
-                                                  ),
-                                                  Text("Video")
-                                                ],
-                                              ),
-                                              Column(
-                                                children: [
-                                                  GestureDetector(
-                                                    onTap: () {},
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              45),
-                                                      child: Container(
-                                                        color:
-                                                            Color(0xFFFF8C00),
-                                                        child: Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(10.0),
-                                                          child: Image.asset(
-                                                            "assets/images/one_text.png",
-                                                            width: 30,
-                                                            height: 30,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  Text("Tugas")
-                                                ],
-                                              ),
-                                              Column(
-                                                children: [
-                                                  GestureDetector(
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              45),
-                                                      child: Container(
-                                                        color:
-                                                            Color(0xFFFF8C00),
-                                                        child: Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(10.0),
-                                                          child: Image.asset(
-                                                            "assets/images/one_text.png",
-                                                            width: 30,
-                                                            height: 30,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    onTap: () {},
-                                                  ),
-                                                  Text("Latihan")
-                                                ],
-                                              ),
-                                              Column(
-                                                children: [
-                                                  GestureDetector(
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              45),
-                                                      child: Container(
-                                                        color:
-                                                            Color(0xFFFF8C00),
-                                                        child: Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(10.0),
-                                                          child: Image.asset(
-                                                            "assets/images/one_text.png",
+                                                            "assets/images/ic_lainnya.png",
+                                                            color: Colors.white,
                                                             width: 30,
                                                             height: 30,
                                                           ),
@@ -763,6 +559,10 @@ class _HomePageState extends State<HomePageSiswa> {
                                                         builder: (context) {
                                                           return DraggableScrollableSheet(
                                                             expand: false,
+                                                            initialChildSize:
+                                                                0.6,
+                                                            minChildSize: 0,
+                                                            maxChildSize: 0.96,
                                                             builder: (context,
                                                                     scrollController) =>
                                                                 Container(
@@ -774,41 +574,76 @@ class _HomePageState extends State<HomePageSiswa> {
                                                                     scrollController,
                                                                 child: Column(
                                                                   children: [
-                                                                    Center(
-                                                                      child: Icon(CupertinoIcons.line_horizontal_3),
+                                                                    Container(
+                                                                      alignment:
+                                                                          Alignment
+                                                                              .center,
+                                                                      margin: EdgeInsets.only(
+                                                                          bottom:
+                                                                              10),
+                                                                      child: Icon(
+                                                                          CupertinoIcons
+                                                                              .line_horizontal_3),
                                                                     ),
-                                                                    Row(
-                                                                      children: [
-                                                                        Text(
-                                                                            "1"),
-                                                                        Text(
-                                                                            "2"),
-                                                                        Text(
-                                                                            "3"),
-                                                                        Text(
-                                                                            "4"),
-                                                                      ],
+                                                                    Padding(
+                                                                      padding: EdgeInsets.symmetric(
+                                                                          vertical:
+                                                                              10,
+                                                                          horizontal:
+                                                                              6),
+                                                                      child:
+                                                                          Row(
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.spaceAround,
+                                                                        children: [
+                                                                          akademik(
+                                                                              context),
+                                                                          absensi(
+                                                                              context),
+                                                                          informasi(
+                                                                              context),
+                                                                          materi(),
+                                                                        ],
+                                                                      ),
                                                                     ),
-                                                                    Row(
-                                                                      children: [
-                                                                        Text(
-                                                                            "5"),
-                                                                        Text(
-                                                                            "6"),
-                                                                        Text(
-                                                                            "7"),
-                                                                        Text(
-                                                                            "8"),
-                                                                      ],
-                                                                    )
+                                                                    Padding(
+                                                                      padding: EdgeInsets.symmetric(
+                                                                          vertical:
+                                                                              10,
+                                                                          horizontal:
+                                                                              6),
+                                                                      child:
+                                                                          Row(
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.spaceAround,
+                                                                        children: [
+                                                                          video(),
+                                                                          tugas(),
+                                                                          latihan(),
+                                                                          pustaka()
+                                                                        ],
+                                                                      ),
+                                                                    ),
+                                                                    Padding(
+                                                                      padding: EdgeInsets.symmetric(
+                                                                          vertical:
+                                                                              10,
+                                                                          horizontal:
+                                                                              6),
+                                                                      child:
+                                                                          Row(
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.spaceAround,
+                                                                        children: [
+                                                                          market(),
+                                                                          donasi()
+                                                                        ],
+                                                                      ),
+                                                                    ),
                                                                   ],
                                                                 ),
                                                               ),
                                                             ),
-                                                            initialChildSize:
-                                                                0.6,
-                                                            minChildSize: 0,
-                                                            maxChildSize: 0.96,
                                                           );
                                                         },
                                                       );
@@ -1837,6 +1672,316 @@ class _HomePageState extends State<HomePageSiswa> {
                     );
         },
       ),
+    );
+  }
+
+  Column latihan() {
+    return Column(
+      children: [
+        GestureDetector(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(45),
+            child: Container(
+              color: Color(0xFFFF8C00),
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Image.asset(
+                  "assets/images/ic_latihan.png",
+                  width: 30,
+                  height: 30,
+                ),
+              ),
+            ),
+          ),
+          onTap: () {},
+        ),
+        Text("Latihan")
+      ],
+    );
+  }
+
+  Column tugas() {
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: () {},
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(45),
+            child: Container(
+              color: Color(0xFFFF8C00),
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Image.asset(
+                  "assets/images/ic_tugas.png",
+                  width: 30,
+                  height: 30,
+                ),
+              ),
+            ),
+          ),
+        ),
+        Text("Tugas")
+      ],
+    );
+  }
+
+  Column video() {
+    return Column(
+      children: [
+        GestureDetector(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(45),
+            child: Container(
+              color: Color(0xFFFF8C00),
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Image.asset(
+                  "assets/images/ic_video.png",
+                  width: 30,
+                  height: 30,
+                ),
+              ),
+            ),
+          ),
+          onTap: () {},
+        ),
+        Text("Video")
+      ],
+    );
+  }
+
+  Column materi() {
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: () {},
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(45),
+            child: Container(
+              color: Color(0xFFFF8C00),
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Image.asset(
+                  "assets/images/ic_materi.png",
+                  width: 30,
+                  height: 30,
+                ),
+              ),
+            ),
+          ),
+        ),
+        Text("Materi")
+      ],
+    );
+  }
+
+  Column informasi(BuildContext context) {
+    return Column(
+      children: [
+        GestureDetector(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(45),
+            child: Container(
+              color: Color(0xFFFF8C00),
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Image.asset(
+                  "assets/images/informasi.png",
+                  width: 30,
+                  height: 30,
+                ),
+              ),
+            ),
+          ),
+          onTap: () {
+            Navigator.push(
+              context,
+              CupertinoPageRoute(
+                builder: (context) => InformasiPage(),
+              ),
+            );
+          },
+        ),
+        Text("Informasi")
+      ],
+    );
+  }
+
+  Column absensi(BuildContext context) {
+    return Column(
+      children: [
+        GestureDetector(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(45),
+            child: Container(
+              color: Color(0xFFFF8C00),
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Image.asset(
+                  "assets/images/absensi.png",
+                  width: 30,
+                  height: 30,
+                ),
+              ),
+            ),
+          ),
+          onTap: () {
+            Navigator.push(
+              context,
+              CupertinoPageRoute(
+                builder: (context) => AbsensiPage(),
+              ),
+            );
+          },
+        ),
+        Text("Absensi")
+      ],
+    );
+  }
+
+  Column akademik(BuildContext context) {
+    return Column(
+      children: [
+        GestureDetector(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(45),
+            child: Container(
+              color: Color(0xFFFF8C00),
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Image.asset(
+                  "assets/images/akademik.png",
+                  width: 30,
+                  height: 30,
+                ),
+              ),
+            ),
+          ),
+          onTap: () {
+            Navigator.push(
+              context,
+              CupertinoPageRoute(
+                builder: (context) => AkademikPage(),
+              ),
+            );
+          },
+        ),
+        Text("Akademik")
+      ],
+    );
+  }
+
+  Column pustaka() {
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: () {},
+          child: Badge(
+            badgeContent: Text(
+              "Segera Hadir",
+              style: TextStyle(fontSize: 8),
+            ),
+            shape: BadgeShape.square,
+            borderRadius: BorderRadius.circular(8),
+            position: BadgePosition.topEnd(),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(45),
+              child: Container(
+                color: Colors.grey.shade600,
+                child: Padding(
+                  padding: EdgeInsets.all(10),
+                  child: ColorFiltered(
+                    colorFilter:
+                        ColorFilter.mode(Colors.grey, BlendMode.saturation),
+                    child: Image.asset(
+                      "assets/images/one_text.png",
+                      width: 30,
+                      height: 30,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        Text("Pustaka")
+      ],
+    );
+  }
+
+  Column market() {
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: () {},
+          child: Badge(
+            badgeContent: Text(
+              "Segera Hadir",
+              style: TextStyle(fontSize: 8),
+            ),
+            shape: BadgeShape.square,
+            borderRadius: BorderRadius.circular(8),
+            position: BadgePosition.topEnd(),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(45),
+              child: Container(
+                color: Colors.grey.shade600,
+                child: Padding(
+                  padding: EdgeInsets.all(10),
+                  child: ColorFiltered(
+                    colorFilter:
+                        ColorFilter.mode(Colors.grey, BlendMode.saturation),
+                    child: Image.asset(
+                      "assets/images/one_text.png",
+                      width: 30,
+                      height: 30,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        Text("Market")
+      ],
+    );
+  }
+
+  Column donasi() {
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: () {},
+          child: Badge(
+            badgeContent: Text(
+              "Segera Hadir",
+              style: TextStyle(fontSize: 8),
+            ),
+            shape: BadgeShape.square,
+            borderRadius: BorderRadius.circular(8),
+            position: BadgePosition.topEnd(),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(45),
+              child: Container(
+                color: Colors.grey.shade600,
+                child: Padding(
+                  padding: EdgeInsets.all(10),
+                  child: ColorFiltered(
+                    colorFilter:
+                        ColorFilter.mode(Colors.grey, BlendMode.saturation),
+                    child: Image.asset(
+                      "assets/images/ic_donasi.png",
+                      width: 30,
+                      height: 30,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        Text("Donasi")
+      ],
     );
   }
 }
